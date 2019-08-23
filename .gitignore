@@ -1,5 +1,4 @@
 **/.vs
 *.sql
 **/bin
-*.sln
 **/obj
