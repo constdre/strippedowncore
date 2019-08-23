@@ -1,0 +1,58 @@
+﻿@using Microsoft.AspNetCore.Http
+@using ASPracticeCore.Utils;
+@inject  IHttpContextAccessor HttpContextAccessor
+
+@{ 
+    int activeUserId = HttpContextAccessor.HttpContext.Session.Get<int>(Constants.KEY_USERID);
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <meta charset="utf-8" />
+    <title>@ViewData["title"]</title>
+    <link href="~/css/materialize.css" rel="stylesheet" />
+    <script src="~/js/materialize.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Raleway|Roboto" rel="stylesheet">
+    <link href="~/css/general.css" rel="stylesheet" />
+    
+</head>
+<body>
+
+    <nav class="blue-grey">
+        <div class="nav-wrapper nav__div">
+            <a class="brand-logo" href="/Home/Index">ItemInventoryTemplate</a>
+            <ul class="ul-right">
+                <li><a class="nav__a" href="/Home/Index">Home</a></li>
+                <li><a class="nav__a" href="/Home/About">About</a></li>
+                @if (activeUserId == default(int))
+                {
+                    <li id="login"><a class="nav__a" href="/Accounts/Access/Login">Login</a></li>
+                }
+                else
+                {
+                    <li id="manage_profile">
+                        <a class="nav__a">Manage Profile</a>
+                    </li>
+                    <li><a class="nav__a" href="/Accounts/Access/Logout">Logout</a></li>
+                }
+
+            </ul>
+        </div>
+    </nav>
+    <partial name="_CookieConsentPartial" />
+
+    <script src="~/js/site.js"></script>
+
+    <div class="page-container">
+        @RenderBody()
+    </div>
+
+    <footer>
+        <hr />
+        Template Web App by Lourd Andre B. Ammuyutan
+    </footer>
+
+
+</body>
+</html>

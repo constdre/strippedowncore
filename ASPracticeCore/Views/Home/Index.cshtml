@@ -1,0 +1,29 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string nameUser = ViewBag.NameUser;
+}
+
+<h2 id="txtName"></h2>
+<div>
+    @if (nameUser != default(string))
+    {
+        <h2>Welcome @nameUser</h2>
+    }
+
+</div>
+
+<script>
+
+    //displayActiveUser();
+    /*
+    async function displayActiveUser() {
+        console.log("retrieved user: ", activeUser);
+        var txtName = document.getElementById("txtName");
+        txtName.textContent = activeUser.name;
+        console.log("txtName text: " + txtName.textContent);
+    }
+    */
+    //console.log("From index");
+</script>

@@ -1,0 +1,208 @@
+﻿
+<div class="div-status div-status--red" hidden>
+    <p id="p_status" class="div-status__text">@ViewBag.statusMessage</p>
+</div>
+
+<div class="tab">
+    <button class="tablink tablink--active" id="tab_login" onclick="switchToLogin()">Sign-in</button>
+    <button class="tablink" id="tab_register" onclick="switchToRegister()">Register</button>
+</div>
+
+<div class="form-container">
+
+    <div id="div_login" class="div-form-account">
+
+        <form id="form_login" method="post" action="/Accounts/Access/Login">
+
+            <div>
+                <label for="email">Email</label>
+                <input id="email" name="email" />
+            </div>
+            <div>
+                <label for="password">Password</label>
+                <input id="password" type="password" name="password" />
+            </div>
+
+
+            <div style="margin:30px 0;"><a id="link_forgotp" href="#">Forgot Password?</a></div>
+            <button id="btn_login" type="submit" class="btn">Login</button>
+
+        </form>
+    </div>
+
+
+    <div id="div_register" class="div-form-account hidden-element">
+
+        <form id="form_register" method="post" action="@Url.Action("Register","Access", new { AreaAttribute="Accounts"})">
+
+            <div id="div-accountinfo" class="div-flex-col">
+                <p id="registerHeader"><b>Account Info</b></p>
+                <div>
+                    <label for="name">Name</label>
+                    <input id="name" name="name" />
+                </div>
+                <div>
+                    <label for="email">Email</label>
+                    <input id="email" name="email" />
+                </div>
+                <div>
+                    <label for="password">Password</label>
+                    <input id="password" type="password" name="password" />
+                </div>
+                <div>
+                    <label for="repeat_pass">Repeat password</label>
+                    <input id="repeat_pass" name="repeat_pass" />
+                </div>
+                <div>
+                    <label for="phone">Phone</label>
+                    <input id="phoneno" name="phoneno" />
+                </div>
+            </div>
+
+
+            <p id="registerHeader"><b>Shipping Address</b></p>
+            <div>
+                <label for="street">Street</label>
+                <input id="street" name="street" />
+            </div>
+            <div>
+                <label for="country">Country</label>
+                <select id="select_country" name="country" class="browser-default" onchange="showFieldsByCountry()">
+                    <option value="default" selected disabled>Choose here</option>
+                    <option value="Philippines">Philippines</option>
+                    <option value="USA">United States</option>
+                </select>
+            </div>
+            <div>
+                <label for="city">City</label>
+                <input id="city" name="city" />
+            </div>
+            <div id="p_state" class="hidden-element">
+                <label for="state">State</label>
+                <input id="state" name="state" />
+            </div>
+            <div>
+                <label for="zip">Zip Code</label>
+                <input id="zip" name="zip" />
+            </div>
+
+
+            <div style="margin-top:20px;">
+                <button id="btn_register" class="btn">Register</button>
+                <button type="button" onclick="document.getElementById('form_register').reset()" class="btn">Reset</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    var pStatus = document.getElementById("p_status");
+
+    if (pStatus.textContent != "") {
+        console.log("status is not empty, show it.");
+        pStatus.parentNode.hidden = false;
+    }
+
+    var page = (function () {
+        return {
+            divLogin: document.getElementById("div_login"),
+            tabLogin: document.getElementById("tab_login"),
+            tabRegister: document.getElementById("tab_register"),
+            register: document.getElementById("div_register"),
+            loginForm: document.getElementById("form_login"),
+            registerForm:document.getElementById("form_register"),
+            countryElement: document.getElementById("select_country"),
+            pState: document.getElementById("p_state")
+        };
+    })();
+    
+    page.loginForm.addEventListener("submit", function (e) {
+        return validateFormFields(this, e);
+    });
+    page.registerForm.addEventListener("submit", function (e) {
+        return validateFormFields(this, e);
+    });
+
+   function validateFormFields(form, e) {
+        var isValidFields = true;
+
+        var elements = form.elements;
+        for (var i = 0; i < elements.length; i++) {
+
+            var item = elements[i];
+            var isRedAlready = item.classList.contains("field-error");
+
+            console.log("Element tagname: " + item.tagName);
+
+            if (item.tagName != "INPUT" && item.tagName != "SELECT") {
+                console.log("Not a relevant element: " + item.nodeName);
+                continue;
+            }
+
+            //check if field is empty:
+            var itemValue = item.tagName === "SELECT" ? item.options[item.selectedIndex].value : item.value;
+            if (!item.value || itemValue === "default") {
+                item.classList.add("field-error");
+                isValidFields = false;
+            } 
+            if (item.value && isRedAlready) {
+                item.classList.remove("field-error");
+            }
+        }
+
+        if (!isValidFields) {
+            e.preventDefault();
+            pStatus.textContent = "Please fill-up required fields.";
+            pStatus.parentNode.hidden = false;
+        }
+        return isValidFields;
+    }
+
+
+    function switchToRegister() {
+
+        //show register and hide login form
+        page.divLogin.classList.add("hidden-element");
+        page.tabLogin.classList.remove("tablink--active");
+
+        page.register.classList.remove("hidden-element");
+        page.tabRegister.classList.add("tablink--active");
+
+    }
+
+    function switchToLogin() {
+
+        //show login and hide register form
+        page.register.classList.add("hidden-element");
+        page.tabRegister.classList.remove("tablink--active");
+
+
+        page.divLogin.classList.remove("hidden-element");
+        page.tabLogin.classList.add("tablink--active");
+
+
+
+        //set the default country option again:
+        page.countryElement.options[0].selected = true;
+        page.pState.classList.add("hidden-element");
+
+    }
+
+    function showFieldsByCountry() {
+
+        var country = page.countryElement.value;
+
+        if (country === "USA") {
+            page.pState.classList.remove("hidden-element");
+        } else {
+            page.pState.classList.add("hidden-element");
+        }
+    }
+
+
+
+</script>
+
+
