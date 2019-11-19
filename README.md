@@ -13,7 +13,10 @@ Features:
 - BEM-named CSS (little to no reliance on predefined CSS classes from Materialize)
 - `Areas` Route
 
-
-
+Found in:
+- */Areas/Accounts/Controllers/
+- */Areas/Accounts/Views/Access/
+- */Repositories/
+- */Utils/
 
 - [x] *more self-developed projects in Android, Java, .NET Core, Windows Forms, being prepared to be pushed currently!*
