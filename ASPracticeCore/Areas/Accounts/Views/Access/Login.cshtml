@@ -1,108 +1,165 @@
-﻿
-<div class="div-status div-status--red" hidden>
-    <p id="p_status" class="div-status__text">@ViewBag.statusMessage</p>
-</div>
+﻿@{ 
 
-<div class="tab">
-    <button class="tablink tablink--active" id="tab_login" onclick="switchToLogin()">Sign-in</button>
-    <button class="tablink" id="tab_register" onclick="switchToRegister()">Register</button>
-</div>
+    bool isError = (bool)ViewData["isError"];
+    string email = "";
+    if (ViewBag.statusMessage != null)
+    {
+        email = ViewBag.statusMessage.Split(" ")[0];
+    }
 
-<div class="form-container">
+}
 
-    <div id="div_login" class="div-form-account">
+<div class="container-horizontal">
 
-        <form id="form_login" method="post" action="/Accounts/Access/Login">
 
-            <div>
-                <label for="email">Email</label>
-                <input id="email" name="email" />
+    <div class="container-access">
+
+        <div class="tab">
+            <button class="tablink tablink--active" id="tab_login" onclick="switchToLogin()">Sign-in</button><button class="tablink" id="tab_register" onclick="switchToRegister()">Register</button>
+        </div>
+        <div class="form-container">
+
+            <div id="div_login" class="div-form-account">
+                <div class="div-status div-status--green" hidden>
+                    <p id="p_status" class="div-status__text">@ViewBag.statusMessage</p>
+                </div>
+                <form id="form_login" method="post" action="/Accounts/Access/Login">
+
+                    <div>
+                        <label class="field-label" for="email">Email</label>
+                        <div class="field-input-wrapper">
+                            <input id="txt_email" class="field-input" id="email" name="email" />
+                        </div>
+
+                    </div>
+                    <div class="next-field">
+                        <label class="field-label" for="password">Password</label>
+                        <div class="field-input-wrapper">
+                            <input class="field-input" id="password" type="password" name="password" />
+                        </div>
+                    </div>
+
+                    <div class="next-field">
+                        <div><a class="forgot-p" href="#">Forgot Password?</a></div>
+
+                    </div>
+
+                    <div class="form-actions-container">
+                        <button id="btn_login" type="submit" class="btn">Login</button>
+                    </div>
+
+                </form>
             </div>
-            <div>
-                <label for="password">Password</label>
-                <input id="password" type="password" name="password" />
+
+
+            <div id="div_register" class="div-form-account hidden-element">
+                <div class="div-status div-status--red" hidden>
+                    <p id="status_register" class="div-status__text">@ViewBag.statusMessage</p>
+                </div>
+                <form id="form_register" method="post" action="@Url.Action("Register","Access", new { AreaAttribute="Accounts"})">
+
+                    <div id="div-accountinfo" class="div-flex-col">
+                        @*<p class="form-header"><b>Account Info</b></p>*@
+                        <div>
+                            <label for="name" class="field-label">Name</label>
+                            <div class="field-input-wrapper">
+                                <input class="field-input" id="name" name="name" />
+                            </div>
+                        </div>
+                        <div class="next-field">
+                            <label for="email" class="field-label">Email</label>
+                            <div class="field-input-wrapper">
+                                <input class="field-input" id="email" name="email" />
+                            </div>
+                        </div>
+                        <div class="next-field">
+                            <label for="password" class="field-label">Password</label>
+                            <div class="field-input-wrapper">
+                                <input class="field-input" id="password" type="password" name="password" />
+                            </div>
+                        </div>
+                        <div class="next-field">
+                            <label for="repeat_pass" class="field-label">Repeat password</label>
+                            <div class="field-input-wrapper">
+                                <input class="field-input" id="repeat_pass" name="repeat_pass" type="password" />
+                            </div>
+                        </div>
+                        <div class="next-field">
+                            <label for="phone" class="field-label">Phone</label>
+                            <div class="field-input-wrapper">
+                                <input class="field-input" id="phoneno" name="phoneno" />
+                            </div>
+                        </div>
+                    </div>
+
+
+                    @*<p class="form-header"><b>Shipping Address</b></p>
+                        <div>
+                            <label for="street" class="field-label">Street</label>
+                            <div class="field-input-wrapper">
+                            <input class="field-input" id="street" name="street" />
+                            </div>
+                        </div>
+                        <div class="next-field">
+                            <label for="country" class="field-label">Country</label>
+                            <div class="field-input-wrapper">
+                            <select id="select_country" name="country" class="browser-default" onchange="showFieldsByCountry()">
+                                <option value="default" selected disabled>Choose here</option>
+                                <option value="Philippines">Philippines</option>
+                                <option value="USA">United States</option>
+                            </select>
+                            </div>
+                        </div>
+                        <div class="next-field">
+                            <label for="city" class="field-label">City</label>
+                            <div class="field-input-wrapper">
+                            <input class="field-input" id="city" name="city" />
+                            </div>
+                        </div>
+                        <div id="p_state" class="hidden-element next-field">
+                            <label for="state" class="field-label">State</label>
+                            <div class="field-input-wrapper">
+                            <input class="field-input" id="state" name="state" />
+                            </div>
+                        </div>
+                        <div class="next-field">
+                            <label for="zip" class="field-label">Zip Code</label>
+                            <div class="field-input-wrapper">
+                            <input class="field-input" id="zip" name="zip" />
+                            </div>
+                        </div>*@
+
+                    <div class="form-actions-container">
+                        <button id="btn_register" class="btn">Register</button>
+                        <button class="btn inline-margin-left" id="btn_reset" type="button">Reset</button>
+                    </div>
+
+                </form>
             </div>
-
-
-            <div style="margin:30px 0;"><a id="link_forgotp" href="#">Forgot Password?</a></div>
-            <button id="btn_login" type="submit" class="btn">Login</button>
-
-        </form>
+        </div>
     </div>
 
-
-    <div id="div_register" class="div-form-account hidden-element">
-
-        <form id="form_register" method="post" action="@Url.Action("Register","Access", new { AreaAttribute="Accounts"})">
-
-            <div id="div-accountinfo" class="div-flex-col">
-                <p id="registerHeader"><b>Account Info</b></p>
-                <div>
-                    <label for="name">Name</label>
-                    <input id="name" name="name" />
-                </div>
-                <div>
-                    <label for="email">Email</label>
-                    <input id="email" name="email" />
-                </div>
-                <div>
-                    <label for="password">Password</label>
-                    <input id="password" type="password" name="password" />
-                </div>
-                <div>
-                    <label for="repeat_pass">Repeat password</label>
-                    <input id="repeat_pass" name="repeat_pass" />
-                </div>
-                <div>
-                    <label for="phone">Phone</label>
-                    <input id="phoneno" name="phoneno" />
-                </div>
-            </div>
-
-
-            <p id="registerHeader"><b>Shipping Address</b></p>
-            <div>
-                <label for="street">Street</label>
-                <input id="street" name="street" />
-            </div>
-            <div>
-                <label for="country">Country</label>
-                <select id="select_country" name="country" class="browser-default" onchange="showFieldsByCountry()">
-                    <option value="default" selected disabled>Choose here</option>
-                    <option value="Philippines">Philippines</option>
-                    <option value="USA">United States</option>
-                </select>
-            </div>
-            <div>
-                <label for="city">City</label>
-                <input id="city" name="city" />
-            </div>
-            <div id="p_state" class="hidden-element">
-                <label for="state">State</label>
-                <input id="state" name="state" />
-            </div>
-            <div>
-                <label for="zip">Zip Code</label>
-                <input id="zip" name="zip" />
-            </div>
-
-
-            <div style="margin-top:20px;">
-                <button id="btn_register" class="btn">Register</button>
-                <button type="button" onclick="document.getElementById('form_register').reset()" class="btn">Reset</button>
-            </div>
-
-        </form>
+    <div class="container-other">
+        <p>*coming soon*</p>
     </div>
 </div>
-
 <script type="text/javascript">
 
     var pStatus = document.getElementById("p_status");
-
+    var statusRegister = document.getElementById("status_register");
+    var txtEmail = document.getElementById("txt_email");
+    //displays it
     if (pStatus.textContent != "") {
         console.log("status is not empty, show it.");
         pStatus.parentNode.hidden = false;
+        @if (isError)
+        {
+            <text>pStatus.parentNode.classList.add("div-status--red")</text>
+        }
+        else
+        {
+            <text>txtEmail.value="@email"</text>
+        }
     }
 
     var page = (function () {
@@ -112,12 +169,12 @@
             tabRegister: document.getElementById("tab_register"),
             register: document.getElementById("div_register"),
             loginForm: document.getElementById("form_login"),
-            registerForm:document.getElementById("form_register"),
+            registerForm: document.getElementById("form_register"),
             countryElement: document.getElementById("select_country"),
             pState: document.getElementById("p_state")
         };
     })();
-    
+
     page.loginForm.addEventListener("submit", function (e) {
         return validateFormFields(this, e);
     });
@@ -125,9 +182,9 @@
         return validateFormFields(this, e);
     });
 
-   function validateFormFields(form, e) {
+    function validateFormFields(form, e) {
         var isValidFields = true;
-
+        var status = (form.id == "form_login") ? pStatus : statusRegister;
         var elements = form.elements;
         for (var i = 0; i < elements.length; i++) {
 
@@ -146,16 +203,21 @@
             if (!item.value || itemValue === "default") {
                 item.classList.add("field-error");
                 isValidFields = false;
-            } 
+            }
             if (item.value && isRedAlready) {
                 item.classList.remove("field-error");
             }
         }
 
         if (!isValidFields) {
-            e.preventDefault();
-            pStatus.textContent = "Please fill-up required fields.";
-            pStatus.parentNode.hidden = false;
+            e.preventDefault();//prevent submit of form to server
+            if (status.parentNode.classList.contains("div-status--green")) {
+                status.parentNode.classList.remove("div-status--green");
+                status.parentNode.classList.add("div-status--red");
+
+            }
+            status.textContent = "Please fill-out the required fields.";
+            status.parentNode.hidden = false;
         }
         return isValidFields;
     }
@@ -167,7 +229,9 @@
         page.divLogin.classList.add("hidden-element");
         page.tabLogin.classList.remove("tablink--active");
 
+
         page.register.classList.remove("hidden-element");
+        page.register.classList.add("form-register")
         page.tabRegister.classList.add("tablink--active");
 
     }
@@ -177,6 +241,7 @@
         //show login and hide register form
         page.register.classList.add("hidden-element");
         page.tabRegister.classList.remove("tablink--active");
+        page.register.classList.remove("form-register")
 
 
         page.divLogin.classList.remove("hidden-element");
@@ -198,6 +263,19 @@
             page.pState.classList.remove("hidden-element");
         } else {
             page.pState.classList.add("hidden-element");
+        }
+    }
+
+    var reset = document.getElementById("btn_reset");
+    reset.onclick = function () {
+        statusRegister.parentNode.hidden = true;
+        page.registerForm.reset();
+        var elements = page.registerForm.elements;
+        for (var i = 0; i < elements.length; i++) {
+            var elem = elements[i];
+            if (elem.classList.contains("field-error")) {
+                elem.classList.remove("field-error");
+            }
         }
     }
 

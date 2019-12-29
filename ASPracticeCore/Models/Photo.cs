@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace ASPracticeCore.Models
 {
-    public class Photo:EntityBase
+    public class Photo:IEntity
     {
-
+        public int Id { get; set; }
         public string FileName { get; set; }
         public int Size { get; set; }
         public string FileType { get; set; }

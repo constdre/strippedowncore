@@ -7,7 +7,7 @@ namespace ASPracticeCore.Areas.Accounts.Models
 {
     public class ProfilePhoto:ASPracticeCore.Models.Photo
     {
-        //the foreignkey for its User owner
+        //the foreignkey for its User
         public int UserId { get; set; }
     }
 }

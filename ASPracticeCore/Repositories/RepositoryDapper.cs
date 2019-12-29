@@ -11,7 +11,7 @@ using Dapper;
 
 namespace ASPracticeCore.Repositories
 {
-    public class RepositoryDapper : IRepository
+    public class RepositoryDapper : IRepositoryA
     {
         IDbConnection conn;
         StringBuilder sb;

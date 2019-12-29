@@ -1,15 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -35,18 +28,26 @@ namespace ASPracticeCore
             });
 
 
-
-
             services.AddDistributedMemoryCache();
+
             services.AddHttpContextAccessor();
+            //Does the session handle simultaneous users?
             services.AddSession(options => {
                 options.IdleTimeout = TimeSpan.FromSeconds(20);
                 options.Cookie.HttpOnly = true;
-                options.Cookie.IsEssential = true;
+                options.Cookie.IsEssential = true; //make this false to enable Check Consent
             });
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
+
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            
+            services.AddDbContext<DAL.ApplicationContext>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("ROG_ASPracticeCore"));
+            });
+
+            services.AddControllersWithViews();
+            //services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
         }
 
@@ -56,7 +57,7 @@ namespace ASPracticeCore
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
+                //app.UseDatabaseErrorPage();
             }
             else
             {
@@ -68,7 +69,12 @@ namespace ASPracticeCore
             app.UseStaticFiles();
             app.UseCookiePolicy();
             app.UseSession();
+            app.UseRouting();
+
             app.UseAuthentication();
+            app.UseAuthorization();
+            
+            /*
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
@@ -78,6 +84,13 @@ namespace ASPracticeCore
                 routes.MapRoute(
                     name:"Area",
                     template:"{area:exists}/{controller=Home}/{action=Index}/{id?}");
+            });
+            */
+            app.UseEndpoints(endPoints =>
+            {
+                endPoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}");
+                endPoints.MapAreaControllerRoute(name: "areas", "areas", "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
             });
         }
     }

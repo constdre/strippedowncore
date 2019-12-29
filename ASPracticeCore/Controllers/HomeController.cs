@@ -17,14 +17,12 @@ namespace ASPracticeCore.Controllers
         public IActionResult Index(string message)
         {
             ViewBag.NameUser = HttpContext.Session.Get<string>(Constants.KEY_USER_NAME)??default;
-            //message = activeUserEmail ?? "Guest";
-            ViewBag.message = message;
             return View();
         }
 
         public IActionResult About()
         {
-            ViewData["Message"] = "ASP.NET Core 2.1 and that's it. Own persistence mechanism through dynamic generic queries.";
+            //ViewData["Message"] = "ASP.NET Core 3.0 and that's it. \n\t-Own persistence mechanism through dynamic generic queries.\n-\tjust Javascript";
             return View();
         }
 

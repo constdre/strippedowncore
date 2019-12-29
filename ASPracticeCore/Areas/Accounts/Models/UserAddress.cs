@@ -6,9 +6,10 @@ using ASPracticeCore.Models;
 
 namespace ASPracticeCore.Areas.Accounts.Models
 {
-    public class UserAddress:EntityBase
+    public class UserAddress:IEntity
     {
-       
+        public int Id { get; set; }
+        public int UserAccountId { get; set; }
         public string Street { get; set; }
         public string City { get; set; }
         public string State { get; set; }

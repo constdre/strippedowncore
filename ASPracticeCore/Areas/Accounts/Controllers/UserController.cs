@@ -14,8 +14,8 @@ namespace ASPracticeCore.Areas.Accounts.Controllers
         public async Task<IActionResult> GetUserShareables(int id)
         {
             //test this
-            Repository repo = new Repository();
-            var shareables = await repo.GetItemsOfOwner<Shareable>("useraccount", "shareable", id);
+            RepositoryReflection repo = new RepositoryReflection();
+            var shareables = await repo.GetItemsOfOwner<ShareableA>("useraccount", "shareable", id);
             return Json(shareables);
         }
         [Route("Accounts/User/ManageProfile")]

@@ -20,7 +20,20 @@ namespace ASPracticeCore.Areas.Accounts.Controllers
         [Route("Accounts/Access/Login")]
         public IActionResult Login(string statusMessage)
         {
-            ViewBag.statusMessage = statusMessage;
+            
+            ViewData["isError"] = false;
+            if (statusMessage != null)
+            {
+                
+                string classifier = statusMessage.Split('_')[0];
+                if (classifier.Equals(Constants.FAILED))
+                {
+                    ViewData["isError"] = true;
+                }
+                ViewBag.statusMessage = statusMessage.Split('_')[1];
+
+            }
+
             return View();
         }
 
@@ -32,11 +45,13 @@ namespace ASPracticeCore.Areas.Accounts.Controllers
             AccountRepository repo = new AccountRepository();
             UserAccount account = repo.Authenticate(email, password);
             bool isAuthenticated = account != null;
-            IActionResult finalResult = isAuthenticated? RedirectToAction("Index", "Home"):RedirectToAction("Login", new {statusMessage="Incorrect username or password."});
+            string failMessage = Constants.FAILED + "_Incorrect username or password.";
+            IActionResult finalResult = isAuthenticated? RedirectToAction("Index", "Home"):RedirectToAction("Login", new {statusMessage=failMessage});
 
             if (isAuthenticated && HttpContext.Session.Get<int>(Constants.KEY_USERID) == default)
             {
                 Util.Log("Setting session data items...");
+                //Is this 1 session per user?
                 HttpContext.Session.Set(Constants.KEY_USERID, account.Id);
                 HttpContext.Session.Set(Constants.KEY_USER_NAME, account.Name);
             }
@@ -45,42 +60,24 @@ namespace ASPracticeCore.Areas.Accounts.Controllers
         }
         
         [Route("Accounts/Access/Register")]
-        public IActionResult Register(UserAccount account, UserAddress address)
+        public IActionResult Register(UserAccount account)
         {
 
-            Util.Log("Inside Register()");
             Util.DisplayObjectProperties(account);
-            Util.DisplayObjectProperties(address);
 
-            Repository repo = new Repository();
-            //add the account, add the address as well
-            string addAccountStatus = repo.Add(account);
-            
-            Util.Log("Add account:", addAccountStatus);
+            RepositoryReflection repo = new RepositoryReflection();
+            string addStatus = repo.Add(account);
 
-            string addAddressStatus = "UserAddress wasn't added because UserAccount didn't add successfully.";
-            //check useraccount add success before adding its address
-            if(addAccountStatus == Constants.SUCCESS)
+            if (addStatus != Constants.SUCCESS)
             {
-                UserAccount recentlyAddedUser = repo.GetAll<UserAccount>().LastOrDefault();
-                address.Id = recentlyAddedUser.Id;//the user's id
-                addAddressStatus = repo.Add(address);
-                Util.Log("Add address:", addAddressStatus);
-            }
-           
-            
-            string successString = Constants.SUCCESS;
-            string[] taskStatusMessages = Util.ControllerUtil.GetFinalStatusMessages(successString, addAccountStatus, addAddressStatus);
-            
-            //taskStatusMessages either contains a single element success string or the whole error collection
-            if (taskStatusMessages[0] != successString)
-            {
-                //then taskStatusMessages is an error collection
                 return RedirectToAction("Error", "Home");
             }
-            //SUCCESS operation
-            return RedirectToAction("Login", new { statusMessage = taskStatusMessages[0] });
+
+            string statusMessage = Constants.SUCCESS + "_" + account.Email + " added successfully!";
+            return RedirectToAction("Login", new { statusMessage });
         }
+       
+        [Route("Accounts/Access/Logout")]
         public IActionResult Logout()
         {
             HttpContext.Session.Remove(Constants.KEY_USERID);

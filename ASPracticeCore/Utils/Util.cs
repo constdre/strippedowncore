@@ -1,17 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using ASPracticeCore.Models;
 using Dapper;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Protocols;
 
 namespace ASPracticeCore.Utils
 {
@@ -29,6 +24,7 @@ namespace ASPracticeCore.Utils
             /// <param name="entity">The entity where the values comes from</param>
             public static void FillSqlCommandParams(ref SqlParameterCollection cParams, EntityBase entity)
             {
+                //param format was generated, could just be passed.
                 PropertyInfo[] props = entity.GetType().GetProperties();
                 string tableName = GetClassName(entity);
                 bool skipId = IsIdAutoIncrement(tableName);
@@ -103,16 +99,14 @@ namespace ASPracticeCore.Utils
                         //invoke Add<T>() again here to insert the custom type
                         continue;
                     }
-                    //skip specifying the id on an id auto-increment table 
+                    //skip including the id on an id auto-increment table 
                     //prop name "id" is uniform since parent abstract class has it
                     if(props[i].Name.ToLower() == "id" && isSkipId == true)
                     {
                         continue;
                     }
-                    sb.Append(props[i].Name.ToLower());
 
-                    //end of specs, add closing parenthesis ")"
-                   
+                    sb.Append(props[i].Name.ToLower());
 
                     if (i == factorIndex)
                     {
@@ -121,8 +115,9 @@ namespace ASPracticeCore.Utils
 
                     sb.Append(",");
                 }
+                //end of specs, add closing parenthesis ")"
                 sb.Append(")");
-                return sb.ToString();
+                return sb.ToString();//sample output - "(col1,col2,col3)"
             }
             public static string WriteQueryParams(PropertyInfo[] props, string tableName)
             {
@@ -148,7 +143,7 @@ namespace ASPracticeCore.Utils
                         continue;
                     }
 
-                    inputParam = "@"+props[i].Name.ToLower();
+                    inputParam = "@"+props[i].Name.ToLower(); //format: @propName
                     sb.Append(inputParam);
 
                     if (i == factorIndex)
@@ -160,7 +155,7 @@ namespace ASPracticeCore.Utils
 
                 }
                 sb.Append(")");
-                return sb.ToString();
+                return sb.ToString();//sample output - (@propName1, @propName2, @propName3)
             }
 
             public static dynamic ProduceInstance(Type t, SqlDataReader dr)
@@ -174,7 +169,6 @@ namespace ASPracticeCore.Utils
                     foreach (DataRow row in columnInfoTable.Rows)
                     {
                         string columnName = row[column_key].ToString();//get column name of current row
-
                         //still following the premise of propName = columnName, assign columnVal to property
                         PropertyInfo prop = t.GetProperty(columnName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                         var columnValue = dr[columnName];

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ASPracticeCore.Repositories
 {
-    public class AccountRepository : Repository
+    public class AccountRepository : RepositoryReflection
     {
         /// <summary>
         /// Child class or Repository for Area:Account-specific domain operations
@@ -25,9 +25,7 @@ namespace ASPracticeCore.Repositories
         {
             Util.Log("email:", email, "\npassword:", password);
 
-            //Inefficient, gets everything first before filtering:
-            //UserAccount account = GetAll<UserAccount>().FirstOrDefault(a => a.Email == email && a.Password == password);
-
+            //through reflection:
             UserAccount account = GetFiltered<UserAccount>(new { email, password }).FirstOrDefault();
             return account; 
         }

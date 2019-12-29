@@ -1,9 +1,18 @@
 ﻿@using Microsoft.AspNetCore.Http
 @using ASPracticeCore.Utils;
-@inject  IHttpContextAccessor HttpContextAccessor
+@using ASPracticeCore.Areas.Accounts.Models;
+@using ASPracticeCore.Repositories;
+@inject IHttpContextAccessor HttpContextAccessor
 
-@{ 
+@{
     int activeUserId = HttpContextAccessor.HttpContext.Session.Get<int>(Constants.KEY_USERID);
+    bool isAuthenticated = (activeUserId != default(int));
+    //UserAccount user = isAuthenticated ? new RepositoryReflection().GetFiltered<UserAccount>(new { activeUserId })[0] : null;
+    UserAccount user = null;
+    if (isAuthenticated)
+    {
+        user = new RepositoryReflection().GetFiltered<UserAccount>(new { id=activeUserId })[0];
+    }
 }
 <!DOCTYPE html>
 <html>
@@ -11,30 +20,35 @@
     <meta name="viewport" content="width=device-width" />
     <meta charset="utf-8" />
     <title>@ViewData["title"]</title>
-    <link href="~/css/materialize.css" rel="stylesheet" />
-    <script src="~/js/materialize.min.js"></script>
-    <link href="https://fonts.googleapis.com/css?family=Raleway|Roboto" rel="stylesheet">
-    <link href="~/css/general.css" rel="stylesheet" />
-    
+    @*<link href="~/css/materialize.css" rel="stylesheet" />
+            <script src="~/js/materialize.min.js"></script>
+        <link href="https://fonts.googleapis.com/css?family=Raleway|Roboto" rel="stylesheet">*@
+    <link rel="stylesheet" href="~/css/general.css" asp-append-version="true" />
+
 </head>
 <body>
 
-    <nav class="blue-grey">
-        <div class="nav-wrapper nav__div">
-            <a class="brand-logo" href="/Home/Index">ItemInventoryTemplate</a>
-            <ul class="ul-right">
-                <li><a class="nav__a" href="/Home/Index">Home</a></li>
-                <li><a class="nav__a" href="/Home/About">About</a></li>
-                @if (activeUserId == default(int))
+    <nav class="nav">
+        
+
+        <a  class="logo" href="/Home/Index">ItemInventoryTemplate</a>
+        <div class="nav__menu">
+            <ul class="nav__ul">
+                <li class="nav-item"><a class="nav__a" href="/Home/Index">Home</a></li>
+                <li class="nav-item"><a class="nav__a" href="/Home/About">About</a></li>
+                @if (isAuthenticated)
                 {
-                    <li id="login"><a class="nav__a" href="/Accounts/Access/Login">Login</a></li>
+                    @*<li class="nav__li" id="manage_profile">
+                        <div class="nav__dropdown">
+                            <button class="dropdown-btn"></button>
+                            <a class="nav__a">Hi @user.Name</a>
+                        </div>
+                    </li>*@
+                    <li class="nav-item nav-item--rightmost"><a class="nav__a" href="/Accounts/Access/Logout">Logout</a></li>
                 }
                 else
                 {
-                    <li id="manage_profile">
-                        <a class="nav__a">Manage Profile</a>
-                    </li>
-                    <li><a class="nav__a" href="/Accounts/Access/Logout">Logout</a></li>
+                    <li class="nav-item nav-item--rightmost" id="login"><a class="nav__a" href="/Accounts/Access/Login">Login</a></li>
                 }
 
             </ul>
@@ -44,13 +58,12 @@
 
     <script src="~/js/site.js"></script>
 
-    <div class="page-container">
+    <div class="content-container">
         @RenderBody()
     </div>
 
     <footer>
-        <hr />
-        Template Web App by Lourd Andre B. Ammuyutan
+        Template Web App - Lourd Andre B. Ammuyutan
     </footer>
 
 
