@@ -1,16 +1,16 @@
 # strippedowncore
 *Vanilla-flavored (with assorted sprinkles)* web application in asp.net CORE MVC
 
-Features:
+# Features:
 - Its own data persistence mechanism
 - Generic methods
-- Dynamic Sql Server query building
-- Emphasis for pure jQuery-free JS. 
-- Attaching of extension methods.
+- **Dynamic** Sql Server **query building**
+- Emphasis for **pure jQuery-free JS.** 
+- Attaching of class **extension methods.**
 - Ultra generic `getAll()` with just a `dynamic`-type search parameter.
-- Stored procedure invocation through Dapper
+- **Stored procedure** invocation through Dapper
 - `HttpContext` session setting and getting
-- BEM-named CSS (little to no reliance on predefined CSS classes from Materialize)
+- Pure user-written BEM-named CSS (no reliance on libraries/frameworks)
 - `Areas` Route
 
 Found in:
