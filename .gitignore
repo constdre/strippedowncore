@@ -5,15 +5,20 @@
 
 
 **/DAL
-**/EF
+**/EF_RefOnly
 
 
 Shareable.cs
-ShareableA.cs
+Paragraph.cs
+SmallImage.cs
 IEntity.cs
 IRepository.cs
 RepositoryEF.cs
 UserController.cs
 Startup.cs
 **/Shareable
-**Areas/Identity
+ShareableController
+shareable.css
+ActiveUserScriptlet.cshtml
+**/File
+favicon.ico

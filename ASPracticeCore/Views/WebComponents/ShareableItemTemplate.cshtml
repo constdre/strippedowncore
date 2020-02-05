@@ -1,16 +1,17 @@
 ﻿<template id="template_shareable_item">
 
     <!--Encapsulated styles and scripts-->
-    <link href="~/css/general.css"/>
-    <link href="~/css/materialize.min.css" />
-    <script src="~/js/materialize.min.js"></script>
+    <link href="~/css/User/profile.css"/>
 
-    <div>
 
-        <p id="pImage">*Insert Image Here*</p>
-        <p id="pTitle">Title</p>
-        <p id="pIntroduction">Introduction</p>
-        
+    <div class="shareable-card shareable-card--small">
+        <div class="s-image-wrapper">
+            <img id="thumbnail" class="s-image"/>
+        </div>
+        <div>
+            <p id="pTitle" class="s-title">Title</p>
+            <p id="pIntroduction" class="s-intro">Introduction</p>
+        </div>
     </div>
 
 </template>

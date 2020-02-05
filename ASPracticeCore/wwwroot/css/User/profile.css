@@ -1,0 +1,72 @@
+﻿@import url("../general.css");
+
+.profile {
+    /*display: grid;
+    grid-template-columns: [col1] fr [col2] fr [col3] fr;
+    grid-template-rows: [row1] fr [row2] fr [row3] fr;*/
+}
+
+.section-header-2 {
+    margin: 0;
+    padding: 0;
+    font-size: 3rem;
+}
+
+.profile__user-info {
+    /*display: flex;
+    flex-direction: column;*/
+    width: 20%;
+    /*border: 5px solid red;*/
+}
+
+.profile__shareables {
+    /*display: flex;
+    flex-flow: row wrap;*/
+    /*border: 5px solid blue;*/
+    /*overflow: auto;*/ /*scroll bar appears automatically*/
+}
+.shareable-items {
+    display: grid;
+    
+    grid-template-columns: [col1] 30rem [col2] 30rem [col3] 30rem;
+    grid-template-rows: [row1] 20rem [row2] 20rem [row3] 20rem;
+}
+.shareable-group {
+    margin-top: 3rem;
+    margin-left: 4rem;
+    box-shadow: var(--shadow-standard);
+}
+
+
+    
+
+.shareable-card {
+    /*margin-top:2rem;*/
+    padding:1rem;
+}
+.shareable-card--small{
+    display:flex;
+    flex-flow:column wrap;
+    justify-content:space-between;
+}
+.s-image-wrapper {
+    
+}
+.s-image {
+    width: 40%;
+    height: 30%;
+}
+
+.s-details {
+    margin-left:2rem;
+}
+
+.s-title {
+    font-size: 1.5rem;
+}
+
+.s-intro {
+    margin-top:1rem;
+    font-size: 0.8rem;
+}
+

@@ -6,7 +6,12 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using ASPracticeCore.Models;
+using Microsoft.AspNetCore.Http;
 using Dapper;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using System.IO;
+using ASPracticeCore.Controllers;
 
 namespace ASPracticeCore.Utils
 {
@@ -18,7 +23,7 @@ namespace ASPracticeCore.Utils
             static readonly List<string> identityIdTables = new List<string>();
             
             /// <summary>
-            /// Updates an SqlCommand's Query Params with values.
+            /// Updates a SqlCommand's Query Params with values.
             /// </summary>
             /// <param name="cParams">The query SqlCommand.Params to be assigned values with</param>
             /// <param name="entity">The entity where the values comes from</param>
@@ -96,7 +101,7 @@ namespace ASPracticeCore.Utils
                     //skip if property is a custom reference type
                     if (!IsPrimitive(props[i].PropertyType))
                     {
-                        //invoke Add<T>() again here to insert the custom type
+                        //future: invoke Add<T>() again here to insert the custom type
                         continue;
                     }
                     //skip including the id on an id auto-increment table 
@@ -110,6 +115,7 @@ namespace ASPracticeCore.Utils
 
                     if (i == factorIndex)
                     {
+                        //skip here already so there's no extra comma
                         continue;
                     }
 
@@ -165,13 +171,15 @@ namespace ASPracticeCore.Utils
                 dynamic entity = Activator.CreateInstance(t);
                 try
                 {
+                    Util.Log("Producing object of type", Util.GetClassName(t));
                     //fill-up the entity's properties with values from the SqlDataReader
-                    foreach (DataRow row in columnInfoTable.Rows)
+                    foreach (DataRow row in columnInfoTable.Rows) //Rows are the columns itself of the table (name, phoneNo, email)
                     {
                         string columnName = row[column_key].ToString();//get column name of current row
+                        var columnValue = dr[columnName];
+                        Util.Log(columnName, ":", columnValue); 
                         //still following the premise of propName = columnName, assign columnVal to property
                         PropertyInfo prop = t.GetProperty(columnName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-                        var columnValue = dr[columnName];
                         prop.SetValue(entity, columnValue);
                     }
                 }catch(Exception e)
@@ -247,12 +255,12 @@ namespace ASPracticeCore.Utils
         public static bool IsPrimitive(Type type)
         {
             bool isPrimitive = type.IsPrimitive || type.Namespace == null || type.Namespace.Equals("System");
-            Util.Log(type + " isPrimitive?", isPrimitive);
+            Log(type + " isPrimitive?", isPrimitive);
             return isPrimitive;
         }
 
 
-        public static void DisplayObjectProperties<T>(T obj) where T:EntityBase
+        public static void DisplayObjectProperties<T>(T obj) where T:class
         {
             Log("Expanding the properties:");
             Log("Type:", typeof(T));
@@ -272,6 +280,10 @@ namespace ASPracticeCore.Utils
             string[] names = type.ToString().Split('.');
             return names[names.Length - 1].ToLower();
         }
+        public static string AttachStatusToMessage(string status, string message)
+        {
+            return status + "_" + message;
+        }
         public static bool IsText(Object prop)
         {
             return prop.GetType() == typeof(string);
@@ -283,6 +295,10 @@ namespace ASPracticeCore.Utils
 
         public class ControllerUtil
         {
+            public ControllerUtil()
+            {
+             
+            }
             public static string[] GetFinalStatusMessages(string statusRef, params string[] messages)
             {
                 //return success
@@ -295,6 +311,45 @@ namespace ASPracticeCore.Utils
                 }
                 
                 return finalStatusMessages;
+            }
+
+            public static bool IsAuthenticated()
+            {
+
+                var httpContextAccessor = new HttpContextAccessor();
+                int activeUserId = httpContextAccessor.HttpContext.Session.Get<int>(Constants.KEY_USERID);
+                bool isAuthenticated = (activeUserId != default) ? true : false;
+                return isAuthenticated;
+            }
+
+           public static List<FilePath> GetFilesFromRequest(IFormFileCollection files, IConfiguration configuration)
+            {
+                List<FilePath> filePaths = new List<FilePath>();
+                string savePath = configuration.GetValue<string>("FileSavePath");
+
+                int i = 0;
+                foreach (IFormFile file in files)
+                {
+                       
+                    var filePath = new ImageFile() {
+                        FileName = Guid.NewGuid().ToString() + "_" + file.FileName,
+                        FileExtension = Path.GetExtension(savePath),
+                        Path = savePath,
+                        IsDisplayPic = false,
+                        ImageSize = file.Length
+                        
+                    };
+                    //for now the first image is display pic, display pic is another post request
+                    if (i == 0)
+                    {
+                        filePath.IsDisplayPic = true;
+                        i = 1;
+                    }
+
+                    filePaths.Add(filePath);
+                }
+                
+                return filePaths;
             }
 
         }

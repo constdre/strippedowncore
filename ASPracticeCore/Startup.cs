@@ -1,10 +1,12 @@
 ﻿using System;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace ASPracticeCore
 {
@@ -26,11 +28,15 @@ namespace ASPracticeCore
                 options.CheckConsentNeeded = context => false; //true to enable cookie consent
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
-
+            
+            //sets default redirection page when user is not authenticated:
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options => { options.LoginPath = "/Areas/Accounts/Views/Access/Login/"; });
 
             services.AddDistributedMemoryCache();
 
             services.AddHttpContextAccessor();
+
             //Does the session handle simultaneous users?
             services.AddSession(options => {
                 options.IdleTimeout = TimeSpan.FromSeconds(20);
@@ -52,7 +58,7 @@ namespace ASPracticeCore
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {

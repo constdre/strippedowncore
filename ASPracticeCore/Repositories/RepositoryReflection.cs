@@ -329,13 +329,13 @@ namespace ASPracticeCore.Repositories
                 return await conn.QueryAsync<T>(sql, new { items_table = itemClassName.ToLower(), fk_column_name = fkName.ToLower(), fk_column_value = ownerId.ToString() }, commandType: CommandType.StoredProcedure);
             }
         }
-        public IEnumerable<ShareableA> GetShareablesOfUser(int id)
+        public IEnumerable<Shareable> GetShareablesOfUser(int id)
         {
             string sql = "usp_GetItemsOfOwner";
-            IEnumerable<ShareableA> userShareables;
+            IEnumerable<Shareable> userShareables;
             using (conn = Util.DbUtil.GetConnection())
             {
-                userShareables = conn.Query<ShareableA>(sql, new { items_table = "shareable", fk_column_name = "userid", fk_column_value = id.ToString() }, commandType: CommandType.StoredProcedure);
+                userShareables = conn.Query<Shareable>(sql, new { items_table = "shareable", fk_column_name = "userid", fk_column_value = id.ToString() }, commandType: CommandType.StoredProcedure);
             }
             return userShareables;
         }

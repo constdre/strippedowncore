@@ -6,12 +6,12 @@
 
 @{
     int activeUserId = HttpContextAccessor.HttpContext.Session.Get<int>(Constants.KEY_USERID);
-    bool isAuthenticated = (activeUserId != default(int));
+    bool isAuthenticated = Util.ControllerUtil.IsAuthenticated();
     //UserAccount user = isAuthenticated ? new RepositoryReflection().GetFiltered<UserAccount>(new { activeUserId })[0] : null;
     UserAccount user = null;
     if (isAuthenticated)
     {
-        user = new RepositoryReflection().GetFiltered<UserAccount>(new { id=activeUserId })[0];
+        user = new RepositoryReflection().GetFiltered<UserAccount>(new { id = activeUserId })[0];
     }
 }
 <!DOCTYPE html>
@@ -28,32 +28,73 @@
 </head>
 <body>
 
-    <nav class="nav">
-        
+    <nav>
 
-        <a  class="logo" href="/Home/Index">ItemInventoryTemplate</a>
+
+        <a class="logo" href="/Home/Index">ItemInventoryTemplate</a>
         <div class="nav__menu">
-            <ul class="nav__ul">
-                <li class="nav-item"><a class="nav__a" href="/Home/Index">Home</a></li>
-                <li class="nav-item"><a class="nav__a" href="/Home/About">About</a></li>
+            <ul>
+                <li><a href="/Home/Index">Home</a></li>
+                <li><a href="/Home/About">About</a></li>
                 @if (isAuthenticated)
                 {
-                    @*<li class="nav__li" id="manage_profile">
-                        <div class="nav__dropdown">
-                            <button class="dropdown-btn"></button>
-                            <a class="nav__a">Hi @user.Name</a>
+                    <li class="dropdown">
+                        Hello, @user.Name
+                        <div class="dropdown-container">
+                            <div class="dropdown-triangle">
+
+                            </div>
+                            <ul class="dropdown-list">
+                                <li><a href='#'>Manage Profile</a></li>
+                                <li><a href='@Url.Action("ManageShareables", "Shareable", new { userId = user.Id })'>My Shareables</a></li>
+                            </ul>
                         </div>
-                    </li>*@
-                    <li class="nav-item nav-item--rightmost"><a class="nav__a" href="/Accounts/Access/Logout">Logout</a></li>
+
+
+                    </li>
                 }
                 else
                 {
-                    <li class="nav-item nav-item--rightmost" id="login"><a class="nav__a" href="/Accounts/Access/Login">Login</a></li>
+                    <li id="login"><a href="/Accounts/Access/Login">Login</a></li>
                 }
 
             </ul>
         </div>
     </nav>
+
+    <!--   <nav class="nav">
+
+
+            <a class="logo" href="/Home/Index">ItemInventoryTemplate</a>
+            <div class="nav__menu">
+                <ul>
+                    <li class="nav-item"><a class="nav__a" href="/Home/Index">Home</a></li>
+                    <li class="nav-item"><a class="nav__a" href="/Home/About">About</a></li>
+                    @if (isAuthenticated)
+                    {
+                        <li class="nav-item nav-item--rightmost dropdown">
+                            Hello @user.Name
+                            <ul class="dropdown__content">
+
+                                <li><a href='#' class="dropdown__item">Manage Profile</a></li>
+
+                                <li><a class="dropdown__item" href='@Url.Action("ManageShareables", "Shareable", new { userId = user.Id })'>My Shareables</a></li>
+
+                            </ul>
+
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item nav-item--rightmost" id="login"><a class="nav__a" href="/Accounts/Access/Login">Login</a></li>
+                    }
+
+                </ul>
+            </div>
+        </nav>
+    -->
+
+
     <partial name="_CookieConsentPartial" />
 
     <script src="~/js/site.js"></script>

@@ -2,11 +2,13 @@
 using ASPracticeCore.Models;
 using ASPracticeCore.Repositories;
 using ASPracticeCore.Utils;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 
@@ -39,7 +41,7 @@ namespace ASPracticeCore.Areas.Accounts.Controllers
 
         [HttpPost]
         [Route("Accounts/Access/Login")]
-        public IActionResult Login(string email, string password)
+        public async Task<IActionResult> Login(string email, string password)
         {
            
             AccountRepository repo = new AccountRepository();
@@ -51,9 +53,18 @@ namespace ASPracticeCore.Areas.Accounts.Controllers
             if (isAuthenticated && HttpContext.Session.Get<int>(Constants.KEY_USERID) == default)
             {
                 Util.Log("Setting session data items...");
-                //Is this 1 session per user?
                 HttpContext.Session.Set(Constants.KEY_USERID, account.Id);
                 HttpContext.Session.Set(Constants.KEY_USER_NAME, account.Name);
+
+                //create auth cookie that will enable [Authorize] annotation 
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, account.Id.ToString())
+                };
+                ClaimsIdentity userIdentity = new ClaimsIdentity(claims, "login");
+                ClaimsPrincipal principal = new ClaimsPrincipal(userIdentity);
+                await HttpContext.SignInAsync(principal);
+                
             }
 
             return finalResult;
@@ -78,10 +89,12 @@ namespace ASPracticeCore.Areas.Accounts.Controllers
         }
        
         [Route("Accounts/Access/Logout")]
-        public IActionResult Logout()
+        public async Task<IActionResult> LogoutAsync()
         {
             HttpContext.Session.Remove(Constants.KEY_USERID);
             HttpContext.Session.Remove(Constants.KEY_USER_NAME);
+            await HttpContext.SignOutAsync();
+
             return RedirectToAction("Login");
         }
 

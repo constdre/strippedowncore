@@ -1,0 +1,115 @@
+﻿@using Microsoft.AspNetCore.Http
+@using ASPracticeCore.Utils;
+@using ASPracticeCore.Areas.Accounts.Models;
+@using ASPracticeCore.Repositories;
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    int activeUserId = HttpContextAccessor.HttpContext.Session.Get<int>(Constants.KEY_USERID);
+    bool isAuthenticated = (activeUserId != default(int));
+
+    //So both values in a ternary operation are evaluated before they're assigned acc to the condition.
+    //UserAccount user = isAuthenticated ? new RepositoryReflection().GetFiltered<UserAccount>(new { activeUserId })[0] : null;
+
+    UserAccount user = null;
+    if (isAuthenticated)
+    {
+        user = new RepositoryReflection().GetFiltered<UserAccount>(new { id = activeUserId })[0];
+    }
+}
+
+<link rel="stylesheet" href="~/css/User/profile.css" />
+
+<!-- for each page in order to use the custom elements I have to include these two-->
+@{await Html.RenderPartialAsync("~/Views/WebComponents/ShareableItemTemplate.cshtml");}
+<script type="module" src="~/js/CustomElements/shareable-card.js"></script>
+
+
+<div id="div_page_content" class="profile content-container">
+
+    <div id="div_user_info" class="profile__user-info">
+        <img id="img_profile_pic" alt="profile picture" class="" />
+        <p id="p_name" class="">@user.Name</p>
+    </div>
+
+    <div id="div_shareables" class="profile__shareables">
+        <p class="section-header-2">Your Posts</p>
+        <div id="shareable_items">
+
+        </div>
+        <!--insert shareable preview custom element right here-->
+        <div class="form-actions form-actions--right">
+            <button id="createShareable" class="btn btn--large1" onclick="createShareable()">Add Shareable</button>
+        </div>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+
+    var shareable_items = document.getElementById("shareable_items");
+    shareable_items.onload = displayInformation();
+    //isolate query params from URL
+    var urlParams = new URLSearchParams(location.search);
+    var userId = urlParams.get("userId");
+    async function displayInformation() {
+
+
+        console.log("Logged in user id: " + userId);
+        var url = "/User/GetUserShareables/?userId=" + userId; //or activeUser.id from shared layout's JS
+
+        var shareables = await getResource(url);
+
+        for (var i = 0; i < shareables.length; i++) {
+            var item = shareables[i];
+            //container div to give in-between margin to items.
+            var container = document.createElement("div");
+            container.classList.add("shareable-group");
+            //last item will have no margin : do with class
+            //if (index != (shareables.length - 1)) {
+            //    container.setAttribute("style", "margin-bottom:15px;");
+            //}
+
+
+            //must have prior knowledge on ui elements inside custom element
+            var shareableCard = document.createElement("shareable-card");
+            var p_intro = shareableCard.shadowRoot.getElementById("pIntroduction");
+            var p_title = shareableCard.shadowRoot.getElementById("pTitle");
+
+            p_title.textContent = item.title;
+            p_intro.textContent = item.introduction;
+            console.log("shareable was created on " + item.datetimestamp);
+            container.appendChild(shareableCard);
+            shareable_items.appendChild(container);
+        }
+
+        /*        shareables.forEach((index, item) => {
+                    //container div to give in-between margin to items.
+                    var container = document.createElement("div");
+                    container.classList.add("shareable-group");
+                    //last item will have no margin : do with class
+                    //if (index != (shareables.length - 1)) {
+                    //    container.setAttribute("style", "margin-bottom:15px;");
+                    //}
+
+                    //must have prior knowledge on ui elements within custom element
+                    var shareableCard = document.createElement("shareable-card");
+                    var p_intro = shareableCard.getElementById("pIntroduction");
+                    var p_title = shareableCard.getElementById("pTitle");
+
+
+                    p_title.textContent = item.title;
+                    p_intro.textContent = item.introduction;
+                    console.log("shareable was created on " + item.datetimestamp);
+                    container.appendChild(shareableCard);
+                    shareable_items.appendChild(container);
+                });*/
+
+    }
+
+    function createShareable() {
+        //redirect to a link:
+        window.location.href = "@Url.Action("CreateShareable", "Shareable", new { userId = user.Id })";
+    }
+
+</script>
