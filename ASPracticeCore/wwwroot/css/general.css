@@ -1,5 +1,5 @@
 ﻿/*Follows the BEM Naming Standard*/
-@import url('https://fonts.googleapis.com/css?family=Raleway|Roboto');
+@import url('https://fonts.googleapis.com/css?family=PT+Sans|Raleway|Roboto&display=swap');
 
 :root {
     --bradius-card: 1.5rem;
@@ -30,7 +30,7 @@ body {
     min-height: 100vh;
     margin: 0;
     padding: 0 0 3rem 0;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'PT Sans', sans-serif;
     background-color: var(--main-page-bg); /*grey lighten-4*/
 }
 
@@ -47,6 +47,7 @@ nav {
     font-size: 1rem;
     /*box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
     box-shadow: 0px 1px 10px #999;
+    font-family:'Roboto', sans-serif;
 }
 nav ul{
     padding:0;
@@ -190,12 +191,21 @@ dropdown-btn {
     /*font-size:1.5rem;*/
     padding: 2rem var(--main-padding-sides);
 }
-
+.narrowed-container {
+    padding: 0 var(--main-padding-sides);
+}
 .container-horizontal {
     display: flex;
     justify-content: space-between;
 }
-
+.container-center {
+    text-align:center;
+}
+.container-paper {
+    padding: 2rem var(--main-padding-sides);
+    background-color:white;
+    box-shadow:var(--shadow-standard);
+}
 .container-other {
     display: flex;
     align-items: center;
@@ -428,6 +438,9 @@ dropdown-btn {
     list-style-type: none;
 }
 
+.header-large{
+   font-size:3rem;
+}
 .form-header {
     font-size: 20px;
 }

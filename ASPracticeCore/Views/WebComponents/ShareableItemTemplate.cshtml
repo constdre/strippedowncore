@@ -1,17 +1,26 @@
 ﻿<template id="template_shareable_item">
 
     <!--Encapsulated styles and scripts-->
-    <link href="~/css/User/profile.css"/>
+    <link href="~/css/shareable.css" />
 
 
-    <div class="shareable-card shareable-card--small">
-        <div class="s-image-wrapper">
-            <img id="thumbnail" class="s-image"/>
+    <!--<div class="shareable-card shareable-card--small">
+            <div class="s-image-wrapper">
+                <img id="thumbnail" class="s-image"/>
+            </div>
+            <div>
+                <p id="pTitle" class="s-title">Title</p>
+                <p id="pIntroduction" class="s-intro">Introduction</p>
+            </div>
         </div>
+    -->
+    <div class="shareable-card">
         <div>
-            <p id="pTitle" class="s-title">Title</p>
-            <p id="pIntroduction" class="s-intro">Introduction</p>
+            <img class="s-image-large" />
+        </div>
+        <div class="s-details">
+            <p class="s-title"></p>
+            <p class="s-intro"></p>
         </div>
     </div>
-
 </template>
