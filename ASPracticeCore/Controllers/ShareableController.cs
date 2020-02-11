@@ -29,7 +29,7 @@ namespace ASPracticeCore.Controllers
 
         public IActionResult ManageShareables(int userId)
         {
-            ViewData["userId"] = userId;
+            ViewBag.userId = userId;
             return View();
         }
         [HttpGet]

@@ -39,7 +39,7 @@ namespace ASPracticeCore
 
             //Does the session handle simultaneous users?
             services.AddSession(options => {
-                options.IdleTimeout = TimeSpan.FromSeconds(20);
+                options.IdleTimeout = TimeSpan.FromMinutes(20);
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true; //make this false to enable Check Consent
             });

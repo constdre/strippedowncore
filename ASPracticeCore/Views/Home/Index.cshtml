@@ -4,10 +4,10 @@
     string nameUser = ViewBag.NameUser; 
 }
 
-<div class="welcome-message">
+<div class="content-container">
     @if (nameUser != default(string))
     {
-        <h2>Hello, @nameUser!</h2>
+        <h1>Hello, @nameUser!</h1>
     }
 </div>
 
