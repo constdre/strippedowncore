@@ -231,7 +231,7 @@ namespace ASPracticeCore.Repositories
                 }
             }
 
-            string finalQuery = sb.ToString();
+            string finalQuery = sb.ToString(); //SELECT * FROM Table WHERE id = @id AND name = @name
             Util.Log(finalQuery);
 
             //Query execution, object building : reflection, add to List:
@@ -326,7 +326,7 @@ namespace ASPracticeCore.Repositories
             string fkName = ownerClassName + "id";
             using (conn = Util.DbUtil.GetConnection())
             {
-                return await conn.QueryAsync<T>(sql, new { items_table = itemClassName.ToLower(), fk_column_name = fkName.ToLower(), fk_column_value = ownerId.ToString() }, commandType: CommandType.StoredProcedure);
+                return await conn.QueryAsync<T>(sql, new { items_table = itemClassName.ToLower(), fk_column_name = fkName.ToLower(), fk_value = ownerId.ToString() }, commandType: CommandType.StoredProcedure);
             }
         }
         public IEnumerable<Shareable> GetShareablesOfUser(int id)

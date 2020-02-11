@@ -22,3 +22,5 @@ shareable.css
 ActiveUserScriptlet.cshtml
 **/File
 favicon.ico
+
+**/wwwroot/images

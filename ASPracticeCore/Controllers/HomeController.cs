@@ -14,7 +14,7 @@ namespace ASPracticeCore.Controllers
 {
     public class HomeController : Controller
     {
-        public static bool loggedInMode = true;
+        public static bool loggedInMode = false;
         public IActionResult Index(string message)
         {
             if(loggedInMode == true)
@@ -23,6 +23,8 @@ namespace ASPracticeCore.Controllers
                 HttpContext.Session.Set(Constants.KEY_USER_NAME, "admin" );
             }
             ViewBag.NameUser = HttpContext.Session.Get<string>(Constants.KEY_USER_NAME)??default;
+            int userId = HttpContext.Session.Get<int>(Constants.KEY_USERID);
+
             return View();
         }
 

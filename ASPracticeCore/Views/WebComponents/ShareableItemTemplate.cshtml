@@ -1,17 +1,17 @@
 ﻿<template id="template_shareable_item">
 
     <!--Encapsulated styles and scripts-->
-    <link href="~/css/User/profile.css"/>
+    <link rel="stylesheet" href="~/css/shareable.css" />
 
-
-    <div class="shareable-card shareable-card--small">
-        <div class="s-image-wrapper">
-            <img id="thumbnail" class="s-image"/>
-        </div>
-        <div>
-            <p id="pTitle" class="s-title">Title</p>
-            <p id="pIntroduction" class="s-intro">Introduction</p>
-        </div>
+    <div class="shareable-large" >
+                <div class="shareable-group">
+                    <img id="thumbnail" class="s-image-large" src="~/images/kobe.jpeg"/>
+                    @*<div id="thumbnail" class="s-image-large"></div>*@
+                </div>
+                <div class="shareable-group s-details">
+                    <p id="sTitle" class="s-title"><a>Title</a></p>
+                    <p id="sIntroduction" class="s-intro">Introduction</p>
+                </div>
     </div>
-
+    
 </template>

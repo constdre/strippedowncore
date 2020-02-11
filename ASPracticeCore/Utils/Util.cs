@@ -41,6 +41,8 @@ namespace ASPracticeCore.Utils
                         continue;
                     }
                     string key = "@" + props[i].Name.ToLower();//'@propName' is the param format I used
+
+
                     var propValue = props[i].GetValue(entity) ?? DBNull.Value;
                     cParams.AddWithValue(key, propValue);
                 }
@@ -58,6 +60,8 @@ namespace ASPracticeCore.Utils
                         continue;
                     }
                     string key = "@" + props[i].Name.ToLower();//'@propName' is the param format I used
+
+
                     var propValue = props[i].GetValue(entity) ?? DBNull.Value;
                     cParams.AddWithValue(key, propValue);
                 }
