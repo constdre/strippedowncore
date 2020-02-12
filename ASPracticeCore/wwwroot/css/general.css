@@ -199,11 +199,7 @@ dropdown-btn {
     /*font-size:1.5rem;*/
     padding: 2rem var(--main-padding-sides);
 }
-<<<<<<< HEAD
-.narrowed-container {
-    padding: 0 var(--main-padding-sides);
-}
-=======
+
 .container-narrow {
     padding: 0 var(--main-padding-sides);
 }
@@ -219,7 +215,6 @@ dropdown-btn {
     overflow:auto;
 }
 
->>>>>>> master
 .container-horizontal {
     display: flex;
     justify-content: space-between;

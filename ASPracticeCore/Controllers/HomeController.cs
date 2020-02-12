@@ -14,7 +14,7 @@ namespace ASPracticeCore.Controllers
 {
     public class HomeController : Controller
     {
-        public static bool loggedInMode = false;
+        public static bool loggedInMode = true;
         public IActionResult Index(string message)
         {
             if(loggedInMode == true)

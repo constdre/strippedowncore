@@ -32,8 +32,7 @@ namespace ASPracticeCore.Controllers
             ViewBag.userId = userId;
             return View();
         }
-        [HttpGet]
-        
+       
         public IActionResult CreateShareable(int userId, string message)
         {
             //just to mock a signed-in user on page refresh
@@ -47,6 +46,7 @@ namespace ASPracticeCore.Controllers
             //{
             //    return Unauthorized();
             //}
+
             ViewBag.userId = userId;
             ViewData["isError"] = false;
             if (message != null)
@@ -72,6 +72,7 @@ namespace ASPracticeCore.Controllers
             //}
             
             Util.DisplayObjectProperties(shareableVM);
+
             int activeUserId = HttpContext.Session.Get<int>(Constants.KEY_USERID);
             List<FilePath> files = Util.ControllerUtil.GetFilesFromRequest(Request.Form.Files,_config);
             Shareable shareable = new Shareable

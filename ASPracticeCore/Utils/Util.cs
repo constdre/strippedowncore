@@ -330,11 +330,11 @@ namespace ASPracticeCore.Utils
             {
                 List<FilePath> filePaths = new List<FilePath>();
                 string savePath = configuration.GetValue<string>("FileSavePath");
-
                 int i = 0;
+
                 foreach (IFormFile file in files)
                 {
-                       
+                    
                     var filePath = new ImageFile() {
                         FileName = Guid.NewGuid().ToString() + "_" + file.FileName,
                         FileExtension = Path.GetExtension(savePath),
