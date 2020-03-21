@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using ASPracticeCore.Controllers;
+using System.Threading.Tasks;
 
 namespace ASPracticeCore.Utils
 {
@@ -21,7 +22,7 @@ namespace ASPracticeCore.Utils
         {
 
             static readonly List<string> identityIdTables = new List<string>();
-            
+
             /// <summary>
             /// Updates a SqlCommand's Query Params with values.
             /// </summary>
@@ -100,8 +101,9 @@ namespace ASPracticeCore.Utils
                 int factorIndex = isSkipId ? secondToLastIndex : lastIndex;
 
                 sb.Append("(");
-                for(int i=0; i<props.Length; i++){
-                    
+                for (int i = 0; i < props.Length; i++)
+                {
+
                     //skip if property is a custom reference type
                     if (!IsPrimitive(props[i].PropertyType))
                     {
@@ -110,7 +112,7 @@ namespace ASPracticeCore.Utils
                     }
                     //skip including the id on an id auto-increment table 
                     //prop name "id" is uniform since parent abstract class has it
-                    if(props[i].Name.ToLower() == "id" && isSkipId == true)
+                    if (props[i].Name.ToLower() == "id" && isSkipId == true)
                     {
                         continue;
                     }
@@ -144,7 +146,7 @@ namespace ASPracticeCore.Utils
                     //skip if property is a custom reference type
                     if (!IsPrimitive(props[i].PropertyType))
                     {
-                        
+
                         continue;
                     }
                     if (isSkipId == true && props[i].Name.ToLower() == "id")
@@ -153,7 +155,7 @@ namespace ASPracticeCore.Utils
                         continue;
                     }
 
-                    inputParam = "@"+props[i].Name.ToLower(); //format: @propName
+                    inputParam = "@" + props[i].Name.ToLower(); //format: @propName
                     sb.Append(inputParam);
 
                     if (i == factorIndex)
@@ -181,14 +183,15 @@ namespace ASPracticeCore.Utils
                     {
                         string columnName = row[column_key].ToString();//get column name of current row
                         var columnValue = dr[columnName];
-                        Util.Log(columnName, ":", columnValue); 
+                        Util.Log(columnName, ":", columnValue);
                         //still following the premise of propName = columnName, assign columnVal to property
                         PropertyInfo prop = t.GetProperty(columnName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                         prop.SetValue(entity, columnValue);
                     }
-                }catch(Exception e)
+                }
+                catch (Exception e)
                 {
-                    throw e; 
+                    throw e;
                 }
 
                 return entity;
@@ -196,7 +199,7 @@ namespace ASPracticeCore.Utils
             }
 
 
-            
+
             public static bool IsIdAutoIncrement(string tableName)
             {
                 return identityIdTables.Contains(tableName);
@@ -207,7 +210,7 @@ namespace ASPracticeCore.Utils
                 identityIdTables.Add("statickv");
                 identityIdTables.Add("session");
                 identityIdTables.Add("sessiondata");
-                
+
             }
             public static void InsertStaticData(string key, string value)
             {
@@ -255,6 +258,100 @@ namespace ASPracticeCore.Utils
 
         }
 
+        public class ControllerUtil
+        {
+            public ControllerUtil()
+            {
+
+            }
+            public static string[] GetFinalStatusMessages(string statusRef, params string[] messages)
+            {
+                //return success
+                string[] finalStatusMessages = messages.Where(m => m != statusRef).ToArray();
+
+                //If array is empty, everything's "success"-ful
+                if (finalStatusMessages.Length == 0)
+                {
+                    finalStatusMessages = new string[1] { statusRef };
+                }
+
+                return finalStatusMessages;
+            }
+
+            public static bool IsAuthenticated()
+            {
+
+                var httpContextAccessor = new HttpContextAccessor();
+                int activeUserId = httpContextAccessor.HttpContext.Session.Get<int>(Constants.KEY_USERID);
+                bool isAuthenticated = (activeUserId != default) ? true : false;
+                return isAuthenticated;
+            }
+
+            public static async Task<List<FilePath>> SaveFilesToDisk(IFormFileCollection files, string savePath)
+            {
+                //Returns the the paths saved to the DB in a FilePath list
+                List<FilePath> filePaths = new List<FilePath>();
+                int i = 0;
+
+                foreach (IFormFile file in files)
+                {
+
+                    string fullPath = await SaveFormFileToPath(file, savePath);
+                    if (fullPath == Constants.FAILED)
+                    {
+                        return null;
+                    }
+
+                    var filePath = new FilePath()
+                    {
+                        //FileName = Guid.NewGuid().ToString(),
+                        FileName = Path.GetFileName(fullPath),
+                        FileExtension = Path.GetExtension(fullPath),
+                        FileSize = file.Length,
+                        Path = fullPath,
+                        CreatedOn = DateTime.Now,
+                        ImageFile = new ImageFile()
+                        {
+                            //its ID is both the primary and foreign key
+                            ImageSize = file.Length
+                        }
+
+
+                    };
+                    //for now the first image is display pic, display pic is another post request?
+                    if (i == 0)
+                    {
+                        filePath.ImageFile.IsDisplayPic = true;
+                        i = 1;
+                    }
+
+                    filePaths.Add(filePath);
+                }
+
+                return filePaths;
+            }
+
+
+
+        }
+
+        public static async Task<string> SaveFormFileToPath(IFormFile formFile, string path)
+        {
+            if (formFile.Length <= 0)
+            {
+                return Constants.FAILED;
+            }
+
+            string uniqueName = Guid.NewGuid().ToString() + "_" + formFile.FileName + Path.GetExtension(formFile.FileName);
+            var filePath = Path.Combine(path, uniqueName);
+            //var filePath = Path.Combine(path, Path.GetRandomFileName());
+            
+            using (var stream = File.Create(filePath))
+            {
+                await formFile.CopyToAsync(stream);
+            }
+            return filePath;
+        }
 
         public static bool IsPrimitive(Type type)
         {
@@ -263,13 +360,13 @@ namespace ASPracticeCore.Utils
             return isPrimitive;
         }
 
-
-        public static void DisplayObjectProperties<T>(T obj) where T:class
+        public static void DisplayObjectProperties<T>(T obj) where T : class
         {
             Log("Expanding the properties:");
             Log("Type:", typeof(T));
             PropertyInfo[] props = typeof(T).GetProperties();
-            Array.ForEach(props, p => {
+            Array.ForEach(props, p =>
+            {
                 Log(p.Name, ":", p.GetValue(obj));
             });
         }
@@ -297,66 +394,7 @@ namespace ASPracticeCore.Utils
             System.Diagnostics.Debug.WriteLine(string.Join(' ', objs));
         }
 
-        public class ControllerUtil
-        {
-            public ControllerUtil()
-            {
-             
-            }
-            public static string[] GetFinalStatusMessages(string statusRef, params string[] messages)
-            {
-                //return success
-                string[] finalStatusMessages = messages.Where(m => m != statusRef).ToArray();
-                
-                //If array is empty, everything's "success"-ful
-                if (finalStatusMessages.Length == 0)
-                {
-                    finalStatusMessages = new string[1] {statusRef};
-                }
-                
-                return finalStatusMessages;
-            }
 
-            public static bool IsAuthenticated()
-            {
-
-                var httpContextAccessor = new HttpContextAccessor();
-                int activeUserId = httpContextAccessor.HttpContext.Session.Get<int>(Constants.KEY_USERID);
-                bool isAuthenticated = (activeUserId != default) ? true : false;
-                return isAuthenticated;
-            }
-
-           public static List<FilePath> GetFilesFromRequest(IFormFileCollection files, IConfiguration configuration)
-            {
-                List<FilePath> filePaths = new List<FilePath>();
-                string savePath = configuration.GetValue<string>("FileSavePath");
-                int i = 0;
-
-                foreach (IFormFile file in files)
-                {
-                    
-                    var filePath = new ImageFile() {
-                        FileName = Guid.NewGuid().ToString() + "_" + file.FileName,
-                        FileExtension = Path.GetExtension(savePath),
-                        Path = savePath,
-                        IsDisplayPic = false,
-                        ImageSize = file.Length
-                        
-                    };
-                    //for now the first image is display pic, display pic is another post request
-                    if (i == 0)
-                    {
-                        filePath.IsDisplayPic = true;
-                        i = 1;
-                    }
-
-                    filePaths.Add(filePath);
-                }
-                
-                return filePaths;
-            }
-
-        }
 
     }
 }

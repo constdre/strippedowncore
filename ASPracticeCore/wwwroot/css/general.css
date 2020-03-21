@@ -212,7 +212,6 @@ dropdown-btn {
     margin: 0 calc(1.5*var(--main-padding-sides));
     box-shadow:var(--shadow-btn-hover);
     background-color: white;
-    overflow:auto;
 }
 
 .container-horizontal {
@@ -221,11 +220,6 @@ dropdown-btn {
 }
 .container-center {
     text-align:center;
-}
-.container-paper {
-    padding: 2rem var(--main-padding-sides);
-    background-color:white;
-    box-shadow:var(--shadow-standard);
 }
 .container-other {
     display: flex;

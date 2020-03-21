@@ -24,3 +24,5 @@ ActiveUserScriptlet.cshtml
 favicon.ico
 
 **/wwwroot/images
+**/StaticFiles
+**/wwwroot/js/CustomElements

@@ -96,7 +96,9 @@
     <partial name="_CookieConsentPartial" />
 
     <script src="~/js/site.js"></script>
-
+    <script type="text/jsx">
+        ReactDOM.render(<SampleComponent />, document.querySelector('footer'));
+    </script>
     <div class="">
         @RenderBody()
     </div>

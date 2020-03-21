@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -6,7 +7,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 
 namespace ASPracticeCore
 {
@@ -27,6 +30,7 @@ namespace ASPracticeCore
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
                 options.CheckConsentNeeded = context => false; //true to enable cookie consent
                 options.MinimumSameSitePolicy = SameSiteMode.None;
+                
             });
             
             //sets default redirection page when user is not authenticated:
@@ -50,11 +54,16 @@ namespace ASPracticeCore
             services.AddDbContext<DAL.ApplicationContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("ROG_ASPracticeCore"));
+                options.UseLazyLoadingProxies();
             });
+            
+            services.AddControllersWithViews(options=> {
 
-            services.AddControllersWithViews();
-            //services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+                //options.EnableEndpointRouting = false; //to allow for standard mvc routes
 
+            }).AddNewtonsoftJson(opt=> opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
+            
+             
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -72,32 +81,41 @@ namespace ASPracticeCore
             }
 
             app.UseHttpsRedirection();
+
             app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions {
+                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(),"StaticFiles")),
+                RequestPath="/StaticFiles"
+            });
             app.UseCookiePolicy();
             app.UseSession();
+
             app.UseRouting();
 
             app.UseAuthentication();
-            app.UseAuthorization();
-            
-            /*
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
 
-                routes.MapRoute(
-                    name:"Area",
-                    template:"{area:exists}/{controller=Home}/{action=Index}/{id?}");
-            });
-            */
+            app.UseAuthorization();
+
+            
             app.UseEndpoints(endPoints =>
             {
-                endPoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}");
-                endPoints.MapAreaControllerRoute(name: "areas", "areas", "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+                endPoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
+                endPoints.MapAreaControllerRoute(name: "default_areas", "areas", "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+                endPoints.MapControllers(); //for Route attributed actions
 
             });
+
+            //app.UseMvc(routes =>
+            //{
+            //    routes.MapRoute(
+            //        name: "default",
+            //        template: "{controller=Home}/{action=Index}/{id?}");
+
+            //    routes.MapRoute(
+            //        name: "Area",
+            //        template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+            //});
+
         }
     }
 }
