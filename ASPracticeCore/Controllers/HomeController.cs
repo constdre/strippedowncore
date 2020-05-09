@@ -9,22 +9,30 @@ using ASPracticeCore.Repositories;
 using ASPracticeCore.Areas.Accounts.Models;
 using Newtonsoft.Json;
 using ASPracticeCore.Utils;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using ASPracticeCore.DAL;
 
 namespace ASPracticeCore.Controllers
 {
+    [AllowAnonymous]
     public class HomeController : Controller
     {
-        public static bool loggedInMode = true;
-        public IActionResult Index(string message)
-        {
-            if(loggedInMode == true)
-            {
-                HttpContext.Session.Set(Constants.KEY_USERID, 2);
-                HttpContext.Session.Set(Constants.KEY_USER_NAME, "admin" );
-            }
-            ViewBag.NameUser = HttpContext.Session.Get<string>(Constants.KEY_USER_NAME)??default;
-            int userId = HttpContext.Session.Get<int>(Constants.KEY_USERID);
+        public static readonly bool loggedInMode = false;
+        private readonly ApplicationContext _context;
 
+        public HomeController(ApplicationContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<IActionResult> Index(string personName)
+        {
+
+            //await Util.ControllerUtil.MockLoginAsync(2, "admin", _context);
+
+            //get the name of the user:
+            ViewData["personName"] = personName;
             return View();
         }
 
@@ -51,6 +59,7 @@ namespace ASPracticeCore.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
 
 
 

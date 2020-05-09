@@ -13,6 +13,12 @@ using Microsoft.Extensions.Configuration;
 using System.IO;
 using ASPracticeCore.Controllers;
 using System.Threading.Tasks;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using ASPracticeCore.Areas.Accounts.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
+using ASPracticeCore.DAL;
 
 namespace ASPracticeCore.Utils
 {
@@ -264,6 +270,7 @@ namespace ASPracticeCore.Utils
             {
 
             }
+
             public static string[] GetFinalStatusMessages(string statusRef, params string[] messages)
             {
                 //return success
@@ -278,13 +285,70 @@ namespace ASPracticeCore.Utils
                 return finalStatusMessages;
             }
 
+            public static async Task SignInAsync(int userId, ApplicationContext dbContext)
+            {
+                string uniqueKey = Guid.NewGuid().ToString();
+                Log("Session key generated:", uniqueKey);
+
+                //Store this unique key along with the userId to db
+                UserSessionHelper.CreateUserSession(dbContext, userId, uniqueKey);
+
+                //add unique key to auth cookie:
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, uniqueKey)
+                };
+                ClaimsPrincipal principal = new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));//must pass-on the AuthScheme
+                var authProps = new AuthenticationProperties()
+                {
+                    //AllowRefresh = <bool>,
+                    // Refreshing the authentication session should be allowed.
+
+                    //ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(10),
+                    // The time at which the authentication ticket expires. A 
+                    // value set here overrides the ExpireTimeSpan option of 
+                    // CookieAuthenticationOptions set with AddCookie.
+
+                    //IsPersistent = true,
+                    // Whether the authentication session is persisted across 
+                    // multiple requests. When used with cookies, controls
+                    // whether the cookie's lifetime is absolute (matching the
+                    // lifetime of the authentication ticket) or session-based.
+
+                    //IssuedUtc = <DateTimeOffset>,
+                    // The time at which the authentication ticket was issued.
+
+                    //RedirectUri = <string>
+                    // The full path or absolute URI to be used as an http 
+                    // redirect response value.
+
+                };
+                await new HttpContextAccessor().HttpContext.SignInAsync(principal, authProps);
+
+            }
+            public static async Task SignOutAsync(string guid, string authScheme, ApplicationContext dbContext)
+            {
+                //delete user session in the db
+                UserSessionHelper.RemoveUserSession(dbContext, guid);
+                //deletes auth cookie in the browser
+                await new HttpContextAccessor().HttpContext.SignOutAsync(authScheme);
+            }
             public static bool IsAuthenticated()
             {
-
+                //Own way through session data
                 var httpContextAccessor = new HttpContextAccessor();
                 int activeUserId = httpContextAccessor.HttpContext.Session.Get<int>(Constants.KEY_USERID);
                 bool isAuthenticated = (activeUserId != default) ? true : false;
                 return isAuthenticated;
+            }
+            public static async Task<bool> MockLoginAsync(int id, string name, ApplicationContext dbContext)
+            {
+                if (HomeController.loggedInMode)
+                {
+                    await SignInAsync(id, dbContext);
+                }
+                return true;
+
             }
 
             public static async Task<List<FilePath>> SaveFilesToDisk(IFormFileCollection files, string savePath)
@@ -334,7 +398,28 @@ namespace ASPracticeCore.Utils
 
 
         }
-
+        /// <summary>
+        /// (DISCOURAGED - REFERENCE ONLY.
+        /// Make your application RESTful. Put session data in DB, retrieve with key from request cookie.)
+        /// Native .NET Session API
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="name"></param>
+        public static async Task AssignCachedSessionData(int id, string name)
+        {
+            var httpSession = new HttpContextAccessor().HttpContext.Session;
+            await httpSession.LoadAsync(); //makes the session operations async
+            httpSession.Set(Constants.KEY_USERID, id.ToString());
+            httpSession.Set(Constants.KEY_USER_NAME, name);
+        }
+        public static AuthenticationTicket DecryptAuthCookie(IDataProtectionProvider provider, HttpRequest httpRequest)
+        {
+            //parse cookie data encrypted by DataProtection API to C# object
+            var dataProtector = provider.CreateProtector("Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware", CookieAuthenticationDefaults.AuthenticationScheme, "v2");
+            var ticketDataFormat = new TicketDataFormat(dataProtector);
+            AuthenticationTicket authTicket = ticketDataFormat.Unprotect(httpRequest.Cookies[Constants.COOKIE_NAME_AUTH]);
+            return authTicket;
+        }
         public static async Task<string> SaveFormFileToPath(IFormFile formFile, string path)
         {
             if (formFile.Length <= 0)
@@ -345,7 +430,7 @@ namespace ASPracticeCore.Utils
             string uniqueName = Guid.NewGuid().ToString() + "_" + formFile.FileName + Path.GetExtension(formFile.FileName);
             var filePath = Path.Combine(path, uniqueName);
             //var filePath = Path.Combine(path, Path.GetRandomFileName());
-            
+
             using (var stream = File.Create(filePath))
             {
                 await formFile.CopyToAsync(stream);

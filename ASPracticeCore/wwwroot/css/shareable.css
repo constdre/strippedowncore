@@ -1,0 +1,103 @@
+﻿@import url("general.css");
+
+.profile {
+    /*display: grid;
+    grid-template-columns: [col1] fr [col2] fr [col3] fr;
+    grid-template-rows: [row1] fr [row2] fr [row3] fr;*/
+}
+
+.section-header-2 {
+    margin: 0;
+    padding: 0;
+    font-size: 3rem;
+   
+}
+
+.profile__user-info {
+    /*display: flex;
+    flex-direction: column;*/
+    width: 20%;
+    /*border: 5px solid red;*/
+}
+
+.profile__shareables {
+    /*display: flex;
+    flex-flow: row wrap;*/
+    /*border: 5px solid blue;*/
+    /*overflow: auto;*/ /*scroll bar appears automatically*/
+}
+
+/*.shareable-group {
+    box-shadow: var(--shadow-standard);
+}
+.shareable-group:not(:first-child){
+    margin-top:1.5rem;
+}*/
+/*.shareable-card {
+    display:grid;
+    grid-template-columns: [col1]50rem [col2]50rem;
+    grid-template-rows: [row1]30rem;
+    grid-column-gap:0;
+}*/
+
+.container-shareables-1c {
+    /*1 row*/
+    display:flex;
+    flex-flow:column wrap;
+    margin:2rem 0;
+    /* 3x3:
+    display: grid;
+    grid-template-columns: [col1] 30rem [col2] 30rem [col3] 30rem;
+    grid-template-rows: [row1] 20rem [row2] 20rem [row3] 20rem;*/
+}
+.shareable-large {
+    display: grid;
+    grid-template-columns: [col1] 60% [col2] 40%;
+}
+
+.shareable-group{
+    overflow:auto;
+}
+
+.shareable-card--small {
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: space-between;
+}
+
+.s-image-wrapper {
+}
+
+.s-image-large {
+
+   
+    width:100%;/*fill-out to parent's area*/
+    height:inherit;
+    margin:0;
+
+}
+
+.s-details {
+    text-align:center;
+    width:100%;
+    padding:1rem 3rem;
+
+}
+
+.s-title {
+   font-size:2rem;
+}
+.s-title__a{
+    text-decoration:none;
+    color:black;
+}
+.s-title__a:hover{
+    text-decoration:underline;
+    cursor:pointer;
+}
+
+.s-intro {
+    margin-top: 2.5rem;
+    font-size: 1rem;
+}
+

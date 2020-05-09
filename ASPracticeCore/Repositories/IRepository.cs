@@ -9,6 +9,8 @@ namespace ASPracticeCore.Models
         string Update<T>(T entity) where T : class, IEntity;
         string Delete<T>(int id) where T : class, IEntity;
         IQueryable<T> Get<T>() where T : class, IEntity;
+        T GetById<T>(int id) where T : class, IEntity;
+      
 
     }
 }

@@ -1,0 +1,158 @@
+﻿@model ASPracticeCore.ViewModels.AddShareableViewModel
+
+<!--
+    <link href='https://cdn.jsdelivr.net/npm/froala-editor@3.0.6/css/froala_editor.pkgd.min.css' rel='stylesheet' type='text/css' />
+    <script type='text/javascript' src='https://cdn.jsdelivr.net/npm/froala-editor@3.0.6/js/froala_editor.pkgd.min.js'></script>
+-->
+
+
+
+@await Html.PartialAsync("~/Views/WebComponents/ShareableItemTemplate.cshtml")
+<script type="module" src="~/js/CustomElements/shareable-card.js"></script>
+
+
+<div class="container-paper">
+    <div class="container-center">
+        <p class="header-large">Create Shareable</p>
+        <form asp-action="CreateShareable" asp-controller="Shareable" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly"></div>
+            <div class="field-group field-group--medium">
+                <label asp-for="Title" class="field-label field-label--medium"></label>
+                <div class="input-wrapper-medium">
+                    <input asp-for="Title" class="field-input field-input--title" />
+                </div>
+                <span asp-validation-for="Title"></span>
+            </div>
+            <div class="field-group field-group--medium">
+                <label asp-for="Introduction" class="field-label field-label--medium"></label>
+                <div class="input-wrapper-medium">
+                    <textarea rows="4" cols="50" asp-for="Introduction" class="field-input field-input--area"></textarea>
+                </div>
+            </div>
+
+            <div class="field-group field-group--medium">
+                <label for="Paragraphs[0].Text" class="field-label field-label--medium">Paragraphs</label>
+                <btn id="btn_add" class="btn btn-icon" style="margin:0 0.5rem">+</btn><btn id="btn_remove" class="btn btn-icon">-</btn>
+                <div id="paragraphs_container" class="input-wrapper-medium">
+                    <textarea rows="10" cols="50" id="Paragraphs_0__Text" name="Paragraphs[0].Text" class="field-input field-input--area froala"></textarea>
+                </div>
+            </div>
+            <div class="field-group field-group--medium">
+                <input type="file" id="input_image" name="avatar" hidden />
+                <!--<div style="margin-top:2rem;">-->
+                <button id="btn_browse" type="button" class="btn">Select Display Image</button>
+                <!--</div>-->
+                <div id="div_preview" class="hidden-element" style="margin-top:1.5rem;">
+                    <p id="p_filename" class="field-label field-label--medium"></p>
+                    <!--<img id="imgView" style="width:50%;height:50%;margin-top:2rem;" />-->
+                </div>
+            </div>
+
+            <div class="form-actions" style="margin-top:5rem;">
+                <button class="btn btn--large1">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    //initialize froala textarea:
+    //new FroalaEditor('textarea.froala');
+
+    const txtIntro = document.getElementById("Introduction");
+    const txtTitle = document.getElementById("Title");
+
+    const btnAdd = document.getElementById("btn_add");
+    btnAdd.addEventListener("click", addParagraph);
+
+    const btnRemove = document.getElementById("btn_remove");
+    btnRemove.addEventListener("click", removeParagraph);
+    const container = document.getElementById("paragraphs_container");
+
+    const imageName = document.getElementById("p_filename");
+    const imageInput = document.getElementById("input_image");
+    imageInput.addEventListener("change", selectImage);
+    const btn_browse = document.getElementById("btn_browse");
+    btn_browse.addEventListener("click", () => { imageInput.click() });
+
+    const imgView = document.getElementById("imgView");
+    const div_preview = document.getElementById("div_preview");
+
+    function addParagraph() {
+        console.log("pressed add");
+        //var index = container.querySelectorAll("textarea").length;
+        var index = container.children.length;
+        var element = document.createElement("textarea");
+        //element.setAttribute("id", "Paragraphs__" + index + "__Text");
+        //element.setAttribute("name", "Paragraphs[" + index + "].Text");
+        //element.setAttribute("rows", 20);
+        //element.setAttribute("cols", 50);
+        element.setAttribute("id", "Paragraphs__" + index + "__Text");
+        element.setAttribute("name", "Paragraphs[" + index + "].Text");
+        element.setAttribute("rows", 10);
+        element.setAttribute("cols", 50);
+        element.classList.add("field-input", "field-input--area");
+        element.style.marginTop = "4rem";
+
+        container.append(element);
+        //new FroalaEditor('textarea.froala');
+
+
+    }
+
+    function removeParagraph() {
+        console.log("pressed remove");
+        childrenLength = container.children.length;
+        //stop removing when empty:
+        if (childrenLength > 1) {
+            var lastIndex = container.children.length - 1;
+            container.removeChild(container.children[lastIndex]);
+        }
+
+    }
+
+    function selectImage() {
+
+        if (div_preview.childNodes.length > 1) {
+            div_preview.removeChild(div_preview.childNodes[div_preview.childNodes.length - 1]);
+        }
+
+        //create and populate custom element:
+        let container = document.createElement("div");
+        container.setAttribute("style", "margin-top:1rem; box-shadow:0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);");
+        let previewCard = document.createElement("shareable-card");
+
+        let thumbnail = previewCard.shadowRoot.getElementById("thumbnail");
+        let cIntro = previewCard.shadowRoot.getElementById("sIntroduction");
+        let cParagraph = previewCard.shadowRoot.getElementById("sTitle");
+
+        cIntro.textContent = txtIntro.value;
+        cParagraph.textContent = txtTitle.value;
+        let reader = new FileReader();
+        reader.onload = function (e) {
+            thumbnail.setAttribute("src", e.target.result);
+        }
+        reader.readAsDataURL(imageInput.files[0]);
+
+        //attach to parent:
+        container.appendChild(previewCard);
+        div_preview.appendChild(container);
+        imageName.textContent = "Preview shareable:" + imageInput.files.item(0).name;
+        div_preview.classList.remove("hidden-element");
+
+
+
+
+        //var reader = new FileReader();
+        //reader.onload = function (e) {
+        //    imgView.setAttribute("src", e.target.result);
+        //}
+        //reader.readAsDataURL(imageInput.files[0]);
+        //imageName.parentNode.classList.remove("hidden-element");
+        //imageName.textContent = "Selected Thumbnail: " + imageInput.files.item(0).name;
+        //imageName.classList.remove("hidden-element");
+
+    }
+
+
+
+</script>

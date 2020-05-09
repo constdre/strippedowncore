@@ -15,78 +15,63 @@ using Microsoft.AspNetCore.Authorization;
 using System.Web;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace ASPracticeCore.Controllers
 {
-    [Authorize]
+    [SessionValidate]
     public class ShareableController : Controller
     {
         RepositoryEF repo;
         readonly ApplicationContext _context;
         readonly IWebHostEnvironment _env;
         readonly IConfiguration _config;
-        public ShareableController(ApplicationContext context, IConfiguration config, IWebHostEnvironment env)
+        readonly IDataProtectionProvider _provider;
+        public ShareableController(ApplicationContext context, IConfiguration config, IWebHostEnvironment env, IDataProtectionProvider provider)
         {
-            //controller does the disposing of the context
+            //All supplied through DI
             _env = env;
+            //controller does the disposing of the context
             _context = context;
             _config = config;
+            _provider = provider;
         }
 
-        public IActionResult ManageShareables(int userId)
+        public IActionResult UserShareables()
         {
-            ViewBag.userId = userId;
+            //await Util.ControllerUtil.MockLoginAsync(2, "admin",_context);
+
+
+            Util.Log("Opening User Shareables!");
             //string imageSavePath = _env.ContentRootPath + _config.GetValue<string>("FileSavePath");
             ViewData["filePath"] = _config.GetValue<string>("ImageSavePath");
 
-
             return View();
         }
-       
-        public IActionResult CreateShareable(int userId, string message)
+
+        public IActionResult ManageShareable()
         {
-            //just to mock a signed-in user on page refresh
-            if (HomeController.loggedInMode)
-            {
-                HttpContext.Session.Set(Constants.KEY_USERID, 2);
-                HttpContext.Session.Set(Constants.KEY_USER_NAME, "admin");
-            }
-
-            //if (!Util.ControllerUtil.IsAuthenticated())
-            //{
-            //    return Unauthorized();
-            //}
-
-            ViewBag.userId = userId;
-            ViewData["isError"] = false;
-            if (message != null)
-            {
-                string status = message.Split("_")[0];
-                if (status == Constants.FAILED)
-                {
-                    ViewData["isTrue"] = true;
-                }
-                //"SUCCESS_Entity is added successfully" - send just the second half
-                ViewBag.message = message.Split("_")[1];
-            }
             return View();
         }
+        public IActionResult CreateShareable(string message)
+        {
+            return View();
+        }
+
         
         [HttpPost]
         public async Task<IActionResult> CreateShareable(AddShareableViewModel shareableVM)
         {
             
-            //if (!Util.ControllerUtil.IsAuthenticated())
-            //{
-            //    return Unauthorized();
-            //}
             
             //Util.DisplayObjectProperties(shareableVM);
-
-            int activeUserId = HttpContext.Session.Get<int>(Constants.KEY_USERID);
             //string savePath = _env.ContentRootPath + _config.GetValue<string>("ImageSavePath");
-            string savePath = _config.GetValue<string>("ImageSavePath");
 
+            string savePath = _config.GetValue<string>("ImageSavePath");
+            int activeUserId = UserSessionHelper.GetActiveUserId(HttpContext.User.Identity.Name, _context);
             List<FilePath> files = await Util.ControllerUtil.SaveFilesToDisk(Request.Form.Files,savePath);
             Shareable shareable = new Shareable
             {
@@ -103,9 +88,9 @@ namespace ASPracticeCore.Controllers
             repo = new RepositoryEF(_context);
             message = repo.Create(shareable);
 
-
-            IActionResult returnAction = (message == Constants.SUCCESS) ? RedirectToAction("ManageShareables", "Shareable", new { userId = activeUserId }) :
-                RedirectToAction("CreateShareable", new { userId = activeUserId, message = message });
+            
+            IActionResult returnAction = (message == Constants.SUCCESS) ? RedirectToAction("UserShareables") :
+                RedirectToAction("ManageSharable", new { message });
 
             return returnAction;
         }
@@ -118,11 +103,12 @@ namespace ASPracticeCore.Controllers
             Util.Log("Shareables size: ", shareables.Count());
             return Json(shareables);
         }
-        public IActionResult GetShareablesOfUser(int userId)
+        public IActionResult GetShareablesOfUser()
         {
+            int userId = UserSessionHelper.GetActiveUserId(HttpContext.User.Identity.Name, _context); 
             var shareables = _context.GetEntitySet<Shareable>().Where(s => s.UserAccountId == userId).Include(s=>s.Paragraphs).Include(s=>s.FilePaths).ToList();
             //var shareables = _context.GetEntitySet<Shareable>().Where(s => s.UserAccountId == userId).ToList();
-                
+            
             Util.Log("Paragraph1 for Shareable1", shareables[0].Paragraphs.ToList()[0].Text);
             Util.Log("How many shareables of user - ",shareables.Count);
             return Json(shareables);

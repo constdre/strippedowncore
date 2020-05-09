@@ -1,5 +1,4 @@
-﻿import SampleComponent from './CustomElements/SampleComponent.js';
-import ShareableLarge from './CustomElements/ShareableLarge.js';
+﻿
 
 function getResource(url) {
 

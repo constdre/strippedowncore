@@ -4,22 +4,15 @@
 **/obj
 
 
-**/DAL
+
 **/EF_RefOnly
 
 
-Shareable.cs
-Paragraph.cs
-SmallImage.cs
-IEntity.cs
-IRepository.cs
-RepositoryEF.cs
-UserController.cs
+
+
 Startup.cs
-**/Shareable
-ShareableController
-shareable.css
-ActiveUserScriptlet.cshtml
+
+**/node_modules
 **/File
 favicon.ico
 

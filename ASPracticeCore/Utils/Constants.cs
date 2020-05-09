@@ -13,6 +13,8 @@ namespace ASPracticeCore.Utils
         public const string KEY_USERID = "user_id";
         public const string KEY_USER_NAME = "user_name";
         public const string STRING_GUEST = "Guest";
+        public const string COOKIE_NAME_SESSION = "SessionCookie";
+        public const string COOKIE_NAME_AUTH = "AuthenticationCookie";
 
     }
 }

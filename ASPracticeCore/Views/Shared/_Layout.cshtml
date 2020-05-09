@@ -2,17 +2,19 @@
 @using ASPracticeCore.Utils;
 @using ASPracticeCore.Areas.Accounts.Models;
 @using ASPracticeCore.Repositories;
+@using System.Security.Claims;
 @inject IHttpContextAccessor HttpContextAccessor
 
 @{
-    int activeUserId = HttpContextAccessor.HttpContext.Session.Get<int>(Constants.KEY_USERID);
-    bool isAuthenticated = Util.ControllerUtil.IsAuthenticated();
-    //UserAccount user = isAuthenticated ? new RepositoryReflection().GetFiltered<UserAccount>(new { activeUserId })[0] : null;
-    UserAccount user = null;
-    if (isAuthenticated)
-    {
-        user = new RepositoryReflection().GetFiltered<UserAccount>(new { id = activeUserId })[0];
-    }
+    //int userId = default;
+    //string nameUser = default;
+
+    bool isAuthenticated = HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
+    //if (isAuthenticated == true)
+    //{
+    //    nameUser = HttpContextAccessor.HttpContext.User.Identity.Name;
+    //}
+
 }
 <!DOCTYPE html>
 <html>
@@ -37,14 +39,15 @@
                 @if (isAuthenticated)
                 {
                     <li class="dropdown">
-                        Hello, @user.Name
+                        Hello, @ViewData["personName"]
                         <div class="dropdown-container">
                             <div class="dropdown-triangle">
 
                             </div>
                             <ul class="dropdown-list">
                                 <li><a href='#'>Manage Profile</a></li>
-                                <li><a href='@Url.Action("ManageShareables", "Shareable", new { userId = user.Id })'>My Shareables</a></li>
+                                <li><a href='@Url.Action("UserShareables", "Shareable")'>My Shareables</a></li>
+                                <li><a href='@Url.Action("Logout", "Access", new { Area="Accounts"})'>Logout</a></li>
                             </ul>
                         </div>
 
@@ -60,7 +63,7 @@
         </div>
     </nav>
 
-    <!--   <nav class="nav">
+    @*   <nav class="nav">
 
 
             <a class="logo" href="/Home/Index">ItemInventoryTemplate</a>
@@ -90,15 +93,13 @@
                 </ul>
             </div>
         </nav>
-    -->
+    *@
 
 
     <partial name="_CookieConsentPartial" />
 
     <script src="~/js/site.js"></script>
-    <script type="text/jsx">
-        ReactDOM.render(<SampleComponent />, document.querySelector('footer'));
-    </script>
+
     <div class="">
         @RenderBody()
     </div>

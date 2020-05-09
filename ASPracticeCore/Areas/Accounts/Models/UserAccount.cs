@@ -13,6 +13,7 @@ namespace ASPracticeCore.Areas.Accounts.Models
         public string Password { get; set; }
         public string PhoneNo { get; set; }
         public virtual List<Shareable> Shareables { get; set; }
+        public virtual UserSession UserSession { get; set; }
 
     }
 }
