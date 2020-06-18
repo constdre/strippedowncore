@@ -1,5 +1,5 @@
 ﻿/*Follows the BEM Naming Standard*/
-@import url('https://fonts.googleapis.com/css?family=PT+Sans|Raleway|Roboto&display=swap');
+@import url('https://fonts.googleapis.com/css?family=PT+Serif|PT+Sans|Raleway|Roboto&display=swap');
 
 :root {
     --bradius-card: 1.5rem;
@@ -30,6 +30,7 @@ body {
     min-height: 100vh;
     margin: 0;
     padding: 0 0 3rem 0;
+    /*padding:0;*/
     font-family: 'PT Sans', sans-serif;
     background-color: var(--main-page-bg); /*grey lighten-4*/
 }
@@ -188,24 +189,57 @@ dropdown-btn {
         color: white;
         cursor: pointer;
     }
+.vertical-list{
+    display:flex;
+    flex-flow:column wrap;
+    justify-content:space-evenly;
 
-.children-mbs-nl {
+}
+.noselect {
+    -webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none; /* Safari */
+       -khtml-user-select: none; /* Konqueror HTML */
+         -moz-user-select: none; /* Old versions of Firefox */
+          -ms-user-select: none; /* Internet Explorer/Edge */
+              user-select: none; /* Non-prefixed version, currently
+                                    supported by Chrome, Edge, Opera and Firefox */
+}
+.noedit{
+    border:none;
+    padding:2rem 0;
+    resize: none;
+    width:100%;
+    
+}
+.noedit--area{
+    font-size:1.5rem;
+}
+.noedit--title{
+    font-size: 3rem;
+    text-align: center;
+}
+.component-card {
     /*children margin-bottom shadow not last*/
     overflow:hidden;
     box-shadow:var(--shadow-standard);
 }
-.children-mbs-nl:not(:last-child){
+.component-card:not(:last-child){
     margin-bottom:2.5rem;
 }
 .content-container {
     /*font-size:1.5rem;*/
     padding: 2rem var(--main-padding-sides);
 }
-.container-flex-apart {
+.horizontal-apart {
 /*flex row space-between*/
     display:flex;
-    flex-flow:row wrap;
+    flex-flow:row nowrap;
     justify-content:space-between;
+    align-items:center;
+}
+:horizontal-apart--bot{
+    align-items:flex-end;
+
 }
 .container-narrow {
     padding: 0 var(--main-padding-sides);
@@ -325,14 +359,11 @@ dropdown-btn {
     font-size:1rem;
 }
 .field-input {
-    /*background-color:var(--grey-l3);*/
-    /*border-radius:0.3rem;*/
     padding-bottom: 8px;
-    background-color: transparent;
-    
     border: 1px solid gray;
     font-weight: lighter;
     font-size: 1rem;
+    background-color: transparent;
     width: 100%;
 }
     .field-input:focus {
@@ -349,6 +380,7 @@ dropdown-btn {
 .field-input--title {
     border: none;
     border-bottom: 1px solid gray;
+    text-align: center;
     font-size:3rem;
 }
 
@@ -358,7 +390,14 @@ dropdown-btn {
 }
 
 .field-input--area{
-    font-size:2rem;
+    font-size: 1.5rem;
+    resize: none;
+    padding:1rem 0.5rem;
+}
+
+.image {
+    width: 100%;
+    height: 100%;
 }
 
 .next-field {
@@ -419,6 +458,9 @@ dropdown-btn {
     border-radius: 0.3rem;
     text-align: center;
 }
+.btn--adjacent:not(:first-child){
+    margin-left:1rem;
+}
 .btn-icon{
     font-size:1.2rem;
     width:2rem;
@@ -437,7 +479,9 @@ dropdown-btn {
     .btn--orange:hover {
         background-color: #ff8a65; /*deep-orange lighten-2*/
     }
-
+.btn--medium{
+    padding: 1rem 1.5rem;
+}
 .btn--large1{
     padding:1rem 2rem;
 
@@ -509,9 +553,11 @@ dropdown-btn {
     font-size:3rem;
     padding:0;
     margin:0;
+    color:black;
+}
+.header-large--blue{
     color:var(--blue-d3);
 }
-
 .form-header {
     font-size: 20px;
 }

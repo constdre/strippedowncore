@@ -1,100 +1,13 @@
-﻿@using Microsoft.AspNetCore.Http
-@using ASPracticeCore.Utils;
-@using ASPracticeCore.Areas.Accounts.Models;
-@using ASPracticeCore.Repositories;
-@using System.Security.Claims; 
-@inject IHttpContextAccessor HttpContextAccessor
-
-@{
-
-    
-    string filePath = (string)ViewData["filePath"]; 
-    filePath = "~/" + filePath; //turns to: "~/StaticFiles/ShareableImages/"
-
+﻿@{
+    dynamic status = ViewBag.status??"";
 }
-
-
-@*React.js imports and Babel for jsx to js*@
-<script src="https://unpkg.com/react@16/umd/react.development.js"></script>
-<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
-<script src="https://unpkg.com/babel-standalone@6.26.0/babel.js"></script>
-
-<link rel="stylesheet" href="~/css/shareable.css" />
-
-
-<!-- for each page in order to use the custom elements I have to include these two-->
-@{await Html.RenderPartialAsync("~/Views/WebComponents/ShareableItemTemplate.cshtml");}
-<script type="module" src="~/js/CustomElements/shareable-card.js"></script>
-
-<div class="content-container">
-    <div id="div_shareables" class="container-narrow">
-
-        <div class="container-flex-apart">
-            <span class="section-header-2">Your Posts</span>
-            <button class="btn btn--large1">Edit Items</button>
-        </div>
-        <div id="shareable_items" class="container-shareables-1c">
-            <!--where the custom elements will be dynamically appended to-->
-        </div>
-        <div id="react_root" class="container-shareables-1c">
-
-        </div>
-        <!--insert shareable preview custom element right here-->
-        <div class="form-actions form-actions--center">
-            <button id="createShareable" type="button" class="btn btn--large1" onclick="createShareable()">Add Shareable</button>
-        </div>
-    </div>
+<script type="text/javascript">
+    //console.log("is Status an empty string?", @status);
+    //simple instead of intricate approach in the React-Redux system just for status messages.
+    //window.localStorage.setItem("shareable_status", JSON.stringify(@status)); //accessed by the React components
+</script>
+<div id="react_root">
+    <!--Everything happens in React now -->
 </div>
 
-<script type="text/javascript">
-
-    var shareable_items = document.getElementById("shareable_items");
-    //shareable_items.onload = displayItems();
-
-    //isolate query params from URL
-    var urlParams = new URLSearchParams(location.search);
-    //var userId = urlParams.get("userId");//idk returns null
-
-    async function displayItems() {
-
-        var url = "@Url.Action("GetShareablesOfUser", "Shareable")";
-        var shareables = await getResource(url);
-
-        for (var i = 0; i < shareables.length; i++) {
-
-            var item = shareables[i];
-
-            //container div to dictate size and layout for the custom elements
-            var container = document.createElement("div");
-            container.classList.add("children-mbs-nl");
-
-            //must have prior knowledge on ui elements inside custom element
-            var shareableCard = document.createElement("shareable-card");
-            var s_intro = shareableCard.shadowRoot.getElementById("sIntroduction");
-            var s_title = shareableCard.shadowRoot.getElementById("sTitle");
-            var thumbnail = shareableCard.shadowRoot.getElementById("thumbnail");
-            s_title.textContent = item.title;
-            s_intro.textContent = item.introduction;
-
-            if (item.filePaths.length > 0) {
-                
-                let filePath = "@Url.Content(filePath)" + item.filePaths[0].fileName;
-                thumbnail.setAttribute('src', filePath);
-            }
-
-            console.log("shareable was created on " + item.dateTimeStamp);
-            container.appendChild(shareableCard);
-            shareable_items.appendChild(container);
-        }
-
-    }
-
-
-    function createShareable() {
-        //redirect to a view:
-        window.location.href = "@Url.Action("ManageShareable", "Shareable")";
-    }
-
-</script>
-
-<script src="~/clientapp/dist/ShareableModule.js"></script>
+<script src="~/clientapp/dist/attachShareableModule.js"></script>

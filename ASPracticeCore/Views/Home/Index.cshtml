@@ -1,17 +1,16 @@
-﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
+﻿@using ASPracticeCore.Utils; 
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
 @{
     ViewData["Title"] = "Index";
-    string accOwnerName = HttpContextAccessor.HttpContext.User.Identity.Name;
+    string accOwnerName = HttpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c=>c.Type == Constants.STRING_GIVEN_NAME)?.Value??null;
 }
 
 <div class="content-container">
-    @if (accOwnerName != default)
+    @if (accOwnerName != null)
     {
         <h1>Hello, @accOwnerName!</h1>
     }
-    <div id="react_root"></div>
 </div>
-<script src="~/clientapp/dist/index.js"></script>
 <script>
 
     //displayActiveUser();

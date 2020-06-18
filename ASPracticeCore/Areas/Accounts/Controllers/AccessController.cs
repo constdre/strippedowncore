@@ -67,10 +67,7 @@ namespace ASPracticeCore.Areas.Accounts.Controllers
             }
 
             //Match - create auth cookie with unique key in it, save unique key along with user id to the database
-            await Util.ControllerUtil.SignInAsync(account.Id, _context);
-
-
-
+            await Util.ControllerUtil.SignInAsync(account.Id, account.Name);
             return RedirectToAction("Index", "Home", new {personName = account.Name});
         }
 
@@ -93,7 +90,7 @@ namespace ASPracticeCore.Areas.Accounts.Controllers
         }
 
 
-        [SessionValidate]
+        
         [Authorize]
         [Route("Accounts/Access/Logout")]
         public async Task<IActionResult> LogoutAsync()
@@ -108,8 +105,8 @@ namespace ASPracticeCore.Areas.Accounts.Controllers
             //Response.Cookies.Delete(Constants.COOKIE_NAME_SESSION);
 
             //remove the auth cookie
-            var guidKey = HttpContext.User.Identity.Name;
-            await Util.ControllerUtil.SignOutAsync(guidKey,CookieAuthenticationDefaults.AuthenticationScheme,_context); //to delete the auth cookie
+            
+            await Util.ControllerUtil.SignOutAsync(); //to delete the auth cookie
             
 
             return RedirectToAction("Login");

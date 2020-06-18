@@ -13,8 +13,8 @@ namespace ASPracticeCore.Models
     {
         public Shareable()
         {
-            Paragraphs = new HashSet<Paragraph>();
-            FilePaths = new HashSet<FilePath>();
+            Paragraphs = new List<Paragraph>();
+            FilePaths = new List<FilePath>();
         }
 
         public int Id { get; set; }
@@ -22,7 +22,7 @@ namespace ASPracticeCore.Models
         public string Introduction { get; set; }
         public DateTime DateTimeStamp { get; set; }
         public int UserAccountId { get; set; }
-        
+
         public virtual UserAccount UserAccount { get; set; }
         public virtual ICollection<Paragraph> Paragraphs { get; set; }
         public virtual ICollection<FilePath> FilePaths { get; set; }

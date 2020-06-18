@@ -26,13 +26,10 @@ namespace ASPracticeCore.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index(string personName)
+        public async Task<IActionResult> Index()
         {
 
             //await Util.ControllerUtil.MockLoginAsync(2, "admin", _context);
-
-            //get the name of the user:
-            ViewData["personName"] = personName;
             return View();
         }
 

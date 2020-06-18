@@ -1,9 +1,12 @@
-﻿@import url("general.css");
+﻿/*@import url("general.css");*/
 
-.profile {
-    /*display: grid;
-    grid-template-columns: [col1] fr [col2] fr [col3] fr;
-    grid-template-rows: [row1] fr [row2] fr [row3] fr;*/
+:root {
+    --shadow-standard: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+
+.bottommost-actions{
+    margin:auto 0 2rem 0;    
 }
 
 .section-header-2 {
@@ -53,11 +56,10 @@
 .shareable-large {
     display: grid;
     grid-template-columns: [col1] 60% [col2] 40%;
+    box-shadow:var(--shadow-standard);
 }
 
-.shareable-group{
-    overflow:auto;
-}
+
 
 .shareable-card--small {
     display: flex;
@@ -65,23 +67,13 @@
     justify-content: space-between;
 }
 
-.s-image-wrapper {
-}
-
-.s-image-large {
-
-   
-    width:100%;/*fill-out to parent's area*/
-    height:inherit;
-    margin:0;
-
-}
-
 .s-details {
-    text-align:center;
-    width:100%;
-    padding:1rem 3rem;
-
+    display:grid;
+    grid-template-rows:[title]20% [introduction]20% [empty]40% [actions]20%;
+    text-align: center;
+    width: 100%;
+    padding: 1rem 3rem;
+    position: relative;
 }
 
 .s-title {

@@ -23,7 +23,7 @@ namespace ASPracticeCore.DAL
             optionsBuilder.UseLazyLoadingProxies();
         }
 
-        public DbSet<T> GetEntitySet<T>() where T : class, IEntity //if you remove "class" T, .Set<T>() must be of only IEntity ref type.
+        public DbSet<T> GetEntitySet<T>() where T : class, IEntity
         {
             return base.Set<T>();
         }

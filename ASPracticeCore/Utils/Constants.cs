@@ -15,6 +15,7 @@ namespace ASPracticeCore.Utils
         public const string STRING_GUEST = "Guest";
         public const string COOKIE_NAME_SESSION = "SessionCookie";
         public const string COOKIE_NAME_AUTH = "AuthenticationCookie";
+        public const string STRING_GIVEN_NAME = "GIVEN_NAME";
 
     }
 }

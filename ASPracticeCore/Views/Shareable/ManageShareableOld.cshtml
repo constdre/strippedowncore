@@ -31,7 +31,7 @@
 
             <div class="field-group field-group--medium">
                 <label for="Paragraphs[0].Text" class="field-label field-label--medium">Paragraphs</label>
-                <btn id="btn_add" class="btn btn-icon" style="margin:0 0.5rem">+</btn><btn id="btn_remove" class="btn btn-icon">-</btn>
+                <button id="btn_add" class="btn btn-icon" style="margin:0 0.5rem">+</button><button id="btn_remove" class="btn btn-icon">-</button>
                 <div id="paragraphs_container" class="input-wrapper-medium">
                     <textarea rows="10" cols="50" id="Paragraphs_0__Text" name="Paragraphs[0].Text" class="field-input field-input--area froala"></textarea>
                 </div>
@@ -124,9 +124,12 @@
 
         cIntro.textContent = txtIntro.value;
         cParagraph.textContent = txtTitle.value;
+
         let reader = new FileReader();
+        let imgSrc;
         reader.onload = function (e) {
             thumbnail.setAttribute("src", e.target.result);
+            imgSrc = e.target.result;
         }
         reader.readAsDataURL(imageInput.files[0]);
 
@@ -136,17 +139,6 @@
         imageName.textContent = "Preview shareable:" + imageInput.files.item(0).name;
         div_preview.classList.remove("hidden-element");
 
-
-
-
-        //var reader = new FileReader();
-        //reader.onload = function (e) {
-        //    imgView.setAttribute("src", e.target.result);
-        //}
-        //reader.readAsDataURL(imageInput.files[0]);
-        //imageName.parentNode.classList.remove("hidden-element");
-        //imageName.textContent = "Selected Thumbnail: " + imageInput.files.item(0).name;
-        //imageName.classList.remove("hidden-element");
 
     }
 

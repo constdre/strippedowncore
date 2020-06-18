@@ -1,10 +1,66 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
+
 <head>
+    <meta name="viewport" content="width=device-width" />
     <meta charset="utf-8" />
-    <title>Sample Index</title>
+    <title>UserShareables</title>
+    <!-- <link rel="stylesheet" href="../../wwwroot/css/general.css" /> -->
+
 </head>
+
 <body>
-    <div id="react_root"></div>
+
+    <!-- <nav>
+        <a class="logo" href="/Home/Index">ItemInventoryTemplate</a>
+        <div class="nav__menu">
+            <ul>
+                <li><a href="/Home/Index">Home</a></li>
+                <li><a href="/Home/About">About</a></li>
+                @if (isAuthenticated)
+                {
+                    <li class="dropdown">
+                        Hello, @givenName
+                        <div class="dropdown-container">
+                            <div class="dropdown-triangle">
+
+                            </div>
+                            <ul class="dropdown-list">
+                                <li><a href='#'>Manage Profile</a></li>
+                                <li><a href='@Url.Action("UserShareables", "Shareable")'>My Shareables</a></li>
+                                <li><a href='@Url.Action("Logout", "Access", new { Area="Accounts"})'>Logout</a></li>
+                            </ul>
+                        </div>
+
+
+                    </li>
+                }
+                else
+                {
+                    <li id="login"><a href="/Accounts/Access/Login">Login</a></li>
+                }
+
+            </ul>
+        </div>
+    </nav> -->
+    <nav>
+        <a class="logo" href="/Home/Index">ItemInventoryTemplate</a>
+        <div class="nav__menu">
+            <ul>
+                <li><a href="/Home/Index">Home</a></li>
+                <li><a href="/Home/About">About</a></li>
+                <li id="login"><a href="/Accounts/Access/Login">Login</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div id="react_root">
+        
+    </div>
+
+    <footer>
+        Template Web App - Lourd Andre B. Ammuyutan.
+
+    </footer>
 </body>
+
 </html>

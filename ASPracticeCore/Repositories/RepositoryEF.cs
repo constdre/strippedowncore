@@ -9,10 +9,11 @@ using ASPracticeCore.Utils;
 
 namespace ASPracticeCore.Repositories
 {
-    public class RepositoryEF : IRepository
+    public class RepositoryEF : 
+    IRepository
     {
         readonly IDbContext dbContext;
-        
+
         public RepositoryEF(IDbContext dbContext)
         {
             this.dbContext = dbContext;
@@ -26,24 +27,50 @@ namespace ASPracticeCore.Repositories
             {
                 dbContext.SaveChanges();
             }
-            catch (DbUpdateException)
+            catch (Exception)
             {
-                statusMessage = Util.AttachStatusToMessage(Constants.FAILED, "Server error");
+                statusMessage = Util.AttachStatusToMessage(Constants.FAILED, Constants.INTERNAL_ERROR);
             }
             return statusMessage;
+        }
+        public string Update<T>(T entity) where T : class, IEntity
+        {
+            string statusMessage = Constants.SUCCESS;
+
+            //cast IDbContext to DbContext for the Update method
+            // var context = dbContext as DbContext;
+            try
+            {
+                //delete then update for now
+                Delete<T>(entity.Id);
+                entity.Id = default;
+                Create<T>(entity);
+
+                //updates all props
+                // context.Update(entity);
+                
+                dbContext.SaveChanges();
+            }
+            catch (Exception)
+            {
+                statusMessage = Util.AttachStatusToMessage(Constants.FAILED, Constants.INTERNAL_ERROR);
+            }
+            return statusMessage;
+
+
         }
 
         public string Delete<T>(int id) where T : class, IEntity
         {
-            dbContext.GetEntitySet<T>().Remove(GetById<T>(id));
             string statusMessage = Constants.SUCCESS;
             try
             {
+                dbContext.GetEntitySet<T>().Remove(GetById<T>(id));
                 dbContext.SaveChanges();
             }
-            catch (DbUpdateException ex)
+            catch (Exception)
             {
-                statusMessage = Util.AttachStatusToMessage(Constants.FAILED,ex.ToString());
+                statusMessage = Util.AttachStatusToMessage(Constants.FAILED,  Constants.INTERNAL_ERROR);
             }
             return statusMessage;
         }
@@ -54,21 +81,10 @@ namespace ASPracticeCore.Repositories
             return entity;
         }
 
-        public string Update<T>(T entity) where T : class, IEntity
-        {
-            //Delete then Create New approach:
-            string statusMessage = Delete<T>(entity.Id);
-            if(statusMessage == Constants.SUCCESS)
-            {
-                statusMessage = Create(entity); 
-            }
-            return statusMessage;
-            
-        }
 
-        public IQueryable<T> Get<T>() where T:class,IEntity
+        public IQueryable<T> Get<T>() where T : class, IEntity
         {
-             
+
             throw new NotImplementedException();
         }
     }

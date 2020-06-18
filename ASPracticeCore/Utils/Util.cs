@@ -285,18 +285,13 @@ namespace ASPracticeCore.Utils
                 return finalStatusMessages;
             }
 
-            public static async Task SignInAsync(int userId, ApplicationContext dbContext)
+            public static async Task SignInAsync(int userId, string givenName)
             {
-                string uniqueKey = Guid.NewGuid().ToString();
-                Log("Session key generated:", uniqueKey);
-
-                //Store this unique key along with the userId to db
-                UserSessionHelper.CreateUserSession(dbContext, userId, uniqueKey);
-
-                //add unique key to auth cookie:
+                //Add id and name to Auth Cookie then send them back to the browser.
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, uniqueKey)
+                    new Claim(ClaimTypes.Name, userId.ToString()),
+                    new Claim(Constants.STRING_GIVEN_NAME, givenName)
                 };
                 ClaimsPrincipal principal = new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));//must pass-on the AuthScheme
                 var authProps = new AuthenticationProperties()
@@ -324,14 +319,18 @@ namespace ASPracticeCore.Utils
 
                 };
                 await new HttpContextAccessor().HttpContext.SignInAsync(principal, authProps);
-
             }
-            public static async Task SignOutAsync(string guid, string authScheme, ApplicationContext dbContext)
+            public static async Task MockSignInAsync(int id, string name)
             {
-                //delete user session in the db
-                UserSessionHelper.RemoveUserSession(dbContext, guid);
+                if (HomeController.loggedInMode)
+                {
+                    await SignInAsync(id,name);
+                }
+            }
+            public static async Task SignOutAsync()
+            {
                 //deletes auth cookie in the browser
-                await new HttpContextAccessor().HttpContext.SignOutAsync(authScheme);
+                await new HttpContextAccessor().HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             }
             public static bool IsAuthenticated()
             {
@@ -341,19 +340,11 @@ namespace ASPracticeCore.Utils
                 bool isAuthenticated = (activeUserId != default) ? true : false;
                 return isAuthenticated;
             }
-            public static async Task<bool> MockLoginAsync(int id, string name, ApplicationContext dbContext)
-            {
-                if (HomeController.loggedInMode)
-                {
-                    await SignInAsync(id, dbContext);
-                }
-                return true;
-
-            }
 
             public static async Task<List<FilePath>> SaveFilesToDisk(IFormFileCollection files, string savePath)
             {
                 //Returns the the paths saved to the DB in a FilePath list
+
                 List<FilePath> filePaths = new List<FilePath>();
                 int i = 0;
 
@@ -368,7 +359,6 @@ namespace ASPracticeCore.Utils
 
                     var filePath = new FilePath()
                     {
-                        //FileName = Guid.NewGuid().ToString(),
                         FileName = Path.GetFileName(fullPath),
                         FileExtension = Path.GetExtension(fullPath),
                         FileSize = file.Length,
@@ -376,13 +366,14 @@ namespace ASPracticeCore.Utils
                         CreatedOn = DateTime.Now,
                         ImageFile = new ImageFile()
                         {
-                            //its ID is both the primary and foreign key
+                            //ID = both the primary (auto-inc) and foreign key
                             ImageSize = file.Length
                         }
 
 
                     };
-                    //for now the first image is display pic, display pic is another post request?
+
+                    //for now the first image is display pic
                     if (i == 0)
                     {
                         filePath.ImageFile.IsDisplayPic = true;
@@ -398,9 +389,18 @@ namespace ASPracticeCore.Utils
 
 
         }
+        
+        
+        
+        
+
+
+
+
+        
         /// <summary>
         /// (DISCOURAGED - REFERENCE ONLY.
-        /// Make your application RESTful. Put session data in DB, retrieve with key from request cookie.)
+        /// Make your application RESTful. Put session data in DB, retrieve with key from request cookie.
         /// Native .NET Session API
         /// </summary>
         /// <param name="id"></param>
@@ -422,6 +422,8 @@ namespace ASPracticeCore.Utils
         }
         public static async Task<string> SaveFormFileToPath(IFormFile formFile, string path)
         {
+            //Method that copies FormFile's content to specific file
+
             if (formFile.Length <= 0)
             {
                 return Constants.FAILED;
@@ -431,7 +433,7 @@ namespace ASPracticeCore.Utils
             var filePath = Path.Combine(path, uniqueName);
             //var filePath = Path.Combine(path, Path.GetRandomFileName());
 
-            using (var stream = File.Create(filePath))
+            using (FileStream stream = File.Create(filePath))
             {
                 await formFile.CopyToAsync(stream);
             }

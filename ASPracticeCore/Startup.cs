@@ -44,8 +44,8 @@ namespace ASPracticeCore
                     options.LoginPath = new PathString("/Accounts/Access/Login");
                     options.AccessDeniedPath = new PathString("/Home/Error");
                     options.Cookie.SecurePolicy = _environment.IsDevelopment() ? CookieSecurePolicy.None : CookieSecurePolicy.Always;
-                    options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
-                    
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(40);
+
 
                 });
             services.Configure<CookiePolicyOptions>(options =>
@@ -56,6 +56,8 @@ namespace ASPracticeCore
 
             });
             services.AddDistributedMemoryCache();
+
+
             services.AddSession(options =>
             {
                 //Session works with a cookie that contains the session ID
@@ -187,7 +189,7 @@ namespace ASPracticeCore
 
             app.UseRouting();
 
-            
+
             app.UseCookiePolicy();
 
             app.UseAuthentication();
@@ -202,11 +204,12 @@ namespace ASPracticeCore
                     pattern: "{controller=Home}/{action=Index}/{id?}");
 
                 endPoints.MapControllerRoute(
-                    name: "default_area", 
-                    pattern:"{area:exists}/{controller=Home}/{action=Index}/{id?}");
-
+                    name: "default_area",
+                    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+                
                 endPoints.MapControllers(); //for Route attributed actions
             });
+
 
             //app.UseMvc(routes =>
             //{
