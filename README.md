@@ -12,9 +12,10 @@
 - `Areas` route
 
 Found in:
+- */clientapp*
+- */Repositories/*
 - */Areas/Accounts/Controllers/*
 - */Areas/Accounts/Views/Access/*
-- */Repositories/*
 - */Utils/*
 
 - [x] *more self-developed projects in Android, Java, .NET Core, Windows Forms, being prepared to be pushed currently!*
