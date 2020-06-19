@@ -1,15 +1,12 @@
 **/.vs
+**/.vscode
 *.sql
 **/bin
 **/obj
 
-
+**/dist
 
 **/EF_RefOnly
-
-
-
-
 
 
 **/node_modules
