@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ASPracticeCore", "ASPractic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "reactcoref", "..\..\MyReacts\reactcoref\reactcoref.csproj", "{68CDEDA7-52D5-48E3-9C2E-E833FCAFFFD6}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reactrain", "..\..\MyReacts\Reactrain\Reactrain.csproj", "{66EE0BE4-620A-4042-BB93-B616357E5AC4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{68CDEDA7-52D5-48E3-9C2E-E833FCAFFFD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68CDEDA7-52D5-48E3-9C2E-E833FCAFFFD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68CDEDA7-52D5-48E3-9C2E-E833FCAFFFD6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66EE0BE4-620A-4042-BB93-B616357E5AC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66EE0BE4-620A-4042-BB93-B616357E5AC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66EE0BE4-620A-4042-BB93-B616357E5AC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66EE0BE4-620A-4042-BB93-B616357E5AC4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
