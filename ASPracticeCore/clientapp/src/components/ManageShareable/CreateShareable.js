@@ -1,44 +1,51 @@
 
-import React,{useEffect} from 'react';
-import { connect, useDispatch } from 'react-redux';
+import React, { useEffect } from 'react';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import { Redirect } from 'react-router-dom';
-import { createShareable, resetRedirect, resetPostResponse } from "../../features/shareable/ShareableSlice";
+import { addShareable } from "../../redux-slices/ShareableSlice";
 import ActionStatus from "../ActionStatus";
+import { resetAddRedirect, resetAddFailed } from '../../redux-slices/ProcessStatusSlice';
+import { myLog } from "../../../utils";
+import { VIEW_SHAREABLES } from '../../util/constants';
 import {
     increaseP,
     reduceP,
     browseClick,
     selectImage,
-    handleStatus
-} from "../../util/manage-methods";
-import {myLog} from "../../../utils";
+} from "./manage-methods";
 
-//Function-type Component
-const CreateShareable = ({redirect, createShareable, resetRedirect}) => {
+//Function component with hooks and Redux hooks 
+const CreateShareable = () => {
+
+    window.scrollTo(0, 0);
 
     const dispatch = useDispatch();
+    const redirectAdd = useSelector(state => state.processStatus.redirectAdd);
+    const addFailed = useSelector(state => state.processStatus.addFailed);
 
-    if (redirect) {
+    useEffect(() => {
 
-        resetRedirect();
-        return <Redirect to="/Shareable/UserShareables" />
+        return () => {
+            //cleanup function, resets addFailed and addRedirect to null to prevent status showing in the next
+            myLog("Leaving create, resetting status-related states");
+            dispatch(resetAddFailed());
+            dispatch(resetAddRedirect());
+        }
+
+    }, []); //executes the body after first render, executes returning function on unmounting
+
+    if (redirectAdd) {
+        return <Redirect to={VIEW_SHAREABLES} />
     }
-
-    // useEffect(() => {
-    //     //cleanup function, resets redirect:false and postStatus:null
-    //     return () => {
-    //         console.log("Leaving, resetting postResponse")
-    //         dispatch(resetPostResponse());
-    //     }
-    // });
 
     const componentMarkup = (
         <div className="container-paper">
 
-            {/* <ActionStatus /> */}
-
             <div className="container-center">
-                <form name="createForm" data-action="/Shareable/CreateShareableAsync" method="POST" enctype="multipart/form-data">
+
+                {addFailed && <ActionStatus status={addFailed} />}
+
+                <form name="createForm" data-action="/Shareable/CreateShareable" method="POST" enctype="multipart/form-data">
                     <div className="field-group field-group--medium">
                         <div className="input-wrapper-medium">
                             <input id="Title" name="title" placeholder="Title" className="field-input field-input--title" />
@@ -91,37 +98,19 @@ const CreateShareable = ({redirect, createShareable, resetRedirect}) => {
 
     function handleSubmit(e) {
 
-        //build form data
-        // const form = document.getElementById("form_create");
-        // const formElements = form.elements;
-        // const id = formElements.namedItem("Id").value;
-        // const title = formElements.namedItem("Title").value;
-        // const introduction = formElements.namedItem("Introduction").value;
-        // const paragraphs = [];
-        // const paragraphNodes = document.querySelectorAll("textarea[name^=Paragraphs");
-        // for(let i=0; i<paragraphNodes.length; i++){
-        //     paragraphs.push(paragraphNodes[i].value);
-        // }
         e.preventDefault();
         const postForm = document.forms.namedItem("createForm");
         myLog(postForm);
         const formData = new FormData(postForm);
-        myLog("formData before POST", formData);
         const url = postForm.dataset.action
-        
-        createShareable(url,formData);
+
+        //gives the dispatch reference to the async thunk function
+        dispatch(addShareable(url, formData));
 
     }
 
     return componentMarkup;
-
-
-}
-function mapStateToProps(state) {
-    return {
-        redirect: state.shareable.redirect
-    }
 }
 
-
-export default connect(mapStateToProps,{createShareable, resetRedirect})(CreateShareable);
+//no need for connect() to connect redux
+export default CreateShareable;

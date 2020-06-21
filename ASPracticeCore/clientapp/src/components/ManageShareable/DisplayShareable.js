@@ -1,40 +1,49 @@
 
-import React, { useState } from 'react';
-
+import React, { useState, useEffect } from 'react';
 import { Redirect } from 'react-router-dom';
-import { connect, useDispatch } from 'react-redux';
-import { updateShareable, resetPostResponse, resetRedirect } from "../../features/shareable/ShareableSlice";
+import { connect } from 'react-redux';
 import ActionStatus from "../ActionStatus";
+import { updateShareable } from "../../redux-slices/ShareableSlice";
+import { resetUpdateFailed, resetUpdateRedirect } from "../../redux-slices/ProcessStatusSlice";
 import { myLog } from "../../../utils";
-
+import { VIEW_SHAREABLES } from '../../util/constants';
 import {
     increaseP,
     reduceP,
-    handleStatus
-} from "../../util/manage-methods";
+} from "./manage-methods";
 
 
 
-//Function component - promoted approach moving forward
-const DisplayShareable = ({ shareable, redirect, updateShareable, resetRedirect }) => {
+//Function component with hooks and Redux through connect()
+const DisplayShareable = (props) => {
+    
+    const { shareable, 
+        updateShareable, 
+        redirectUpdate, 
+        updateFailed, 
+        resetUpdateRedirect, 
+        resetUpdateFailed } = props;
+    
+        window.scrollTo(0, 0);
 
-    //hooks called should be the same in every render
+    //hooks called should be the equivalent in all renders 
     const [isEdit, toggleEdit] = useState(false);//local state
     const isView = !isEdit;
     const paragraphs = shareable.paragraphs;
-    // const dispatch = useDispatch();
 
-    // useEffect(() => {
-    //     //cleanup function, resets redirect:false and postStatus:null
-    //     return () => {
-    //         console.log("Leaving, resetting postResponse")
-    //         dispatch(resetPostResponse());
-    //     }
-    // });
+    useEffect(() => {
 
-    if (redirect) {
-        resetRedirect();
-        return <Redirect to="/Shareable/UserShareables" />
+        return () => {
+            myLog("Leaving update, resetting status-related states")
+            resetUpdateRedirect();
+            resetUpdateFailed();
+        }
+    }, []);
+
+
+    if (redirectUpdate) {
+        resetUpdateRedirect();
+        return <Redirect to={VIEW_SHAREABLES} />
     }
 
     //classes for view setting:
@@ -51,9 +60,9 @@ const DisplayShareable = ({ shareable, redirect, updateShareable, resetRedirect 
         <div className="container-paper">
             <div className="container-center">
 
-                {/* <ActionStatus /> */}
+                {updateFailed && <ActionStatus status={updateFailed} />}
 
-                <form name="updateForm" data-action="/Shareable/UpdateShareableAsync" method="post" encType="multipart/form-data">
+                <form name="updateForm" data-action="/Shareable/UpdateShareable" method="post" encType="multipart/form-data">
                     <input name="Id" id="Id" value={shareable.id} hidden />
                     <div className="field-group field-group--medium">
                         <div className="input-wrapper-medium horizontal-apart">
@@ -80,10 +89,18 @@ const DisplayShareable = ({ shareable, redirect, updateShareable, resetRedirect 
                         <div id="paragraphs_container" className="input-wrapper-medium">
                             {
                                 paragraphs.length <= 0 ?
-                                    <textarea readOnly={isView} id="Paragraphs_0__Text" name="Paragraphs[0].Text" rows="8" className={class_text_area}></textarea>
-                                    : //ternary, render many
+                                    <div id="ParagraphsData[0]">
+                                        <input id={"Paragraphs_0__Id"} name={"Paragraphs[0].Id"} hidden />
+                                        <textarea readOnly={isView} id="Paragraphs_0__Text" name="Paragraphs[0].Text" rows="8" className={class_text_area}></textarea>
+                                    </div>
+                                    : //ternary, render many:
                                     paragraphs.map((el, i) => {
-                                        return <textarea defaultValue={el.text} readOnly={isView} id={`Paragraphs_${i}__Text`} name={`Paragraphs[${i}].Text`} rows="8" className={class_text_area}></textarea>
+                                        return (
+                                            <div id={`ParagraphsData[${i}]`}>
+                                                <input id={`Paragraphs_${i}__Id`} name={`Paragraphs[${i}].Id`} value={el.id} hidden />
+                                                <textarea defaultValue={el.text} readOnly={isView} id={`Paragraphs_${i}__Text`} name={`Paragraphs[${i}].Text`} rows="8" className={class_text_area}></textarea>
+                                            </div>
+                                        );
                                     })
                             }
                         </div>
@@ -100,6 +117,7 @@ const DisplayShareable = ({ shareable, redirect, updateShareable, resetRedirect 
             </div>
         </div>
     );
+
     function handleSubmit(e) {
 
         e.preventDefault();
@@ -107,28 +125,28 @@ const DisplayShareable = ({ shareable, redirect, updateShareable, resetRedirect 
         myLog(postForm);
 
         const formData = new FormData(postForm);
-        myLog("formData before POST", formData);
         const url = postForm.dataset.action
 
         updateShareable(url, formData);
 
     }
 
-    function iterateParagraphs(paragraphs) {
-        return paragraphs.map((el, i) => {
-            return <textarea defaultValue={el.text} readOnly={isView} id={`Paragraphs_${i}__Text`} name={`Paragraphs[${i}].Text`} rows="8" className={class_text_area}></textarea>
-        })
-    }
-
-
     return componentMarkup;
 
 }
 function mapStateToProps(state) {
     return {
-        redirect: state.shareable.redirect
+        redirectUpdate:state.processStatus.redirectUpdate,
+        updateFailed: state.processStatus.updateFailed
     }
 }
 
 
-export default connect(mapStateToProps, { updateShareable, resetRedirect })(DisplayShareable);
+export default connect(
+    mapStateToProps,
+    {
+        updateShareable,
+        resetUpdateFailed,
+        resetUpdateRedirect
+    }
+)(DisplayShareable);

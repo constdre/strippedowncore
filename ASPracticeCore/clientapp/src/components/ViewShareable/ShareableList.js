@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ShareableLarge from './ShareableLarge';
-import {fetchShareables} from '../../features/shareable/ShareableSlice';
+import {fetchShareables} from '../../redux-slices/ShareableSlice';
 import { connect } from 'react-redux';
 import { myLog } from '../../../utils';
 

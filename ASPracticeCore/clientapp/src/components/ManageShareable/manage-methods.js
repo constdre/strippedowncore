@@ -1,31 +1,44 @@
-import axios from 'axios';
-import { SUCCESS_MESSAGE, FAILED_MESSAGE } from './constants';
-import React from 'react';
-
+//Methods shared by Shareable forms, both add and update
 
 //=========Exported Methods
 export function increaseP() {
 
     const parent = document.getElementById("paragraphs_container");
+
     //child paragraphs:
-    const paragraphs = document.querySelectorAll("#paragraphs_container > [id^=Paragraphs]");
-
-    //attr values:
+    const paragraphs = document.querySelectorAll("#paragraphs_container > [id^=ParagraphsData]")
     const length = paragraphs.length;
-    const id = `Paragraphs_${length}__Text`;//CollectionName_Index__Property
-    const name = `Paragraphs[${length}].Text`;//CollectionName[Index]__Property
 
+    //Duplicate
+    const index = 0; //index of markup to be duplicated
+    const newParagraph = paragraphs[index].cloneNode(true);
+    newParagraph.setAttribute("id", `ParagraphsData[${length}]`);
+    newParagraph.setAttribute("style", "margin-top:1rem");//harmless top margin
+    console.log("CLONED NODE ", newParagraph);
 
-    //Copy default paragraph and update attr 
-    const paragraph = paragraphs[0].cloneNode();
-    paragraph.value = null;
-    paragraph.setAttribute("id", id);
-    paragraph.setAttribute("name", name);
-    paragraph.setAttribute("style", "margin-top:1rem");
-    paragraph.setAttribute("defaultValue","");
+    //new attributes for the cloned elements
+    //for el.Id prop
+    const idKey = `Paragraphs_${length}__Id`;//CollectionName_Index__PropertyName
+    const nameKey = `Paragraphs[${length}].Id`;//CollectionName[Index]__PropertyName
+    //for el.Text prop
+    const idText = `Paragraphs_${length}__Text`;
+    const nameText = `Paragraphs[${length}].Text`;
+
+    //update
+    const paragraphId = newParagraph.querySelector(`#Paragraphs_${index}__Id`); 
+    console.log("CLONED paragraphId",paragraphId);
+    paragraphId.value = null;
+    paragraphId.setAttribute("id", idKey);
+    paragraphId.setAttribute("name", nameKey);
+
+    const paragraphText = newParagraph.querySelector(`#Paragraphs_${index}__Text`);
+    console.log("CLONED text",paragraphText);
+    paragraphText.setAttribute("id", idText);
+    paragraphText.setAttribute("name", nameText);
+    paragraphText.value = null;
+
     //attach to parent
-    parent.appendChild(paragraph);
-
+    parent.appendChild(newParagraph);
 }
 
 export function reduceP() {
@@ -39,7 +52,6 @@ export function reduceP() {
     if (length == 1) {
         return;
     }
-
     //remove last one:
     const lastEl = paragraphs[paragraphs.length - 1];
     parent.removeChild(lastEl);
@@ -51,6 +63,7 @@ export function reduceP() {
 export function browseClick() {
     document.getElementById("input_image").click();
 }
+
 export function selectImage() {
 
     const container = document.getElementById("div_preview");
@@ -75,37 +88,6 @@ export function selectImage() {
     div_preview.classList.remove("hidden-element");
 
 }
-
-export function handleStatus(status) {
-
-    //builds the "success/failed" status UI component
-
-    if (!status) {
-        return;
-    }
-
-    //settle the alert color
-    const color = status.includes(SUCCESS_MESSAGE) ?
-        "green" : "red";
-    const style = {
-        padding: "2rem",
-        backgroundColor: color,
-        borderRadius: "15px",
-        fontFamily: ' "Roboto",sans-serif '
-    }
-
-
-    //get the message part after the '_'
-    const message = status.split("_")[1];//orig: "success_item1 was added"
-    return (
-        <div style={style}>
-            <h2>{message}</h2>
-        </div>
-    );
-
-}
-
-
 
 //======Local Helper Functions
 

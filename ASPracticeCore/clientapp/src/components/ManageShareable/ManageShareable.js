@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import DisplayShareable from './DisplayShareable';
 import CreateShareable from './CreateShareable';
 
-class ManageShareable extends React.Component {
-
-    render() {
+const ManageShareable = (props)=> {
 
         //location.state holds item data, if it exists then purpose is for displaying that data
-        const locationState = this.props.location.state;
+        const locationState = props.location.state;
         if (locationState) {
             return <DisplayShareable shareable={locationState.shareable} />
         }
@@ -15,8 +13,6 @@ class ManageShareable extends React.Component {
         else {
             return <CreateShareable />
         }
-
-    }
 
 }
 

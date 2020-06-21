@@ -5,21 +5,20 @@ import ManageShareable from './ManageShareable/ManageShareable';
 import '../../../wwwroot/css/shareable.css'
 
 
+//Your React App - Entrypoint 
 
-class ShareableModule extends React.Component {
-    //Your React App
-    render() {
-        return (
-            <BrowserRouter>
-                <div>
-                    <Switch>
-                        <Route path="/Shareable/UserShareables/:shareableId?" component={UserShareables} />
-                        <Route exact path="/Shareable/CreateShareable" exact component={ManageShareable} />
-                    </Switch>
-                </div>
-            </BrowserRouter>
-        );
-    }
+const ShareableModule = () => {
+    //Server points to here and React settles the further front-end navigation depending on the address path
+    return (
+        <BrowserRouter>
+            <div>
+                <Switch>
+                    <Route path="/Shareable/UserShareables/:shareableId?" component={UserShareables} />
+                    <Route exact path="/Shareable/CreateShareable" exact component={ManageShareable} />
+                </Switch>
+            </div>
+        </BrowserRouter>
+    );
 }
 
 export default ShareableModule;

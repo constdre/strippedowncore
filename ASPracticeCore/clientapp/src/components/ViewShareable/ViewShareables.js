@@ -1,33 +1,40 @@
 import React from 'react';
-import { toggleManage, resetPostResponse } from '../../features/shareable/ShareableSlice'
 import ShareableList from './ShareableList';
-import { connect } from 'react-redux';
-import { handleStatus } from '../../util/manage-methods';
 import ActionStatus from "../ActionStatus";
-import { myLog } from "../../../utils";
+import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import { toggleManage, resetPostResponse } from '../../redux-slices/ShareableSlice'
+import { resetPostSuccess } from '../../redux-slices/ProcessStatusSlice';
+import { myLog } from "../../../utils";
 
+//Class component style
 class ViewShareables extends React.Component {
 
     constructor(props) {
         super(props);
         this.showCreateComponent = this.showCreateComponent.bind(this);
-        myLog("Here in ViewShareables");
-
     }
-
+    componentDidMount() {
+        window.scrollTo(0, 0);
+    }
+    componentDidUpdate() {
+        //react hooks eliminates this kind of redundancies
+        window.scrollTo(0, 0);
+    }
     componentWillUnmount() {
-        //resets redirect, postStatus, and postSuccess in the store
-        console.log("View Shareable resetting postresponse...");
-        resetPostResponse();
+        //reset postStatus and postSuccess to stop showing alert the next time.
+        console.log("View Shareable resetting postsuccess states...");
+        resetPostSuccess();
     }
 
     render() {
-        const {postStatus} = this.props;
+
+        const { postStatus } = this.props;
+
         return (
             <div className="content-container">
                 <div id="div_shareables" className="container-narrow">
-                    {postStatus && <ActionStatus />}
+                    {postStatus && <ActionStatus status={postStatus}/>}
                     <div className="horizontal-apart">
                         <span className="section-header-2">Your Posts</span>
                         <button className="btn btn--medium" onClick={this.manageShareables}>Manage Items</button>
@@ -45,33 +52,22 @@ class ViewShareables extends React.Component {
     }
 
     showCreateComponent() {
-        //"this" made accessible through .bind(this) in constructor
+        //"this" is the component given by .bind()
         this.props.history.push('/Shareable/CreateShareable');//history, match, location are props automatically attached to children of a router or those rendered through a router
     }
     manageShareables = () => {
-        // //Arrow function where you don't need to explicitly bind 'this' in the constructor
-        this.props.toggleManage();//dispatch to redux state
+        //Arrow function where you don't need to explicitly bind 'this' in the constructor
+        this.props.toggleManage();
     }
 
-    async getUserShareables(url) {
-        //UNUSED, moved to Redux Thunk async action
-        try {
-            const response = await fetch(url);
-            const shareables = await response.json();
-            return shareables;
-        } catch (err) {
-            console.error(err);
-        }
-    }
 }
 
-const selector = (state) => {
+const mapStateToProps = (state) => {
     return {
-        redirect: state.shareable.redirect,
-        postStatus: state.shareable.postStatus
+        postStatus: state.processStatus.postStatus
     }
 }
 const mapDispatchToProps = (dispatch) => {
     return bindActionCreators({ toggleManage, resetPostResponse }, dispatch)
 };
-export default connect(selector, mapDispatchToProps)(ViewShareables);
+export default connect(mapStateToProps, mapDispatchToProps)(ViewShareables);

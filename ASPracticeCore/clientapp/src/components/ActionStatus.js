@@ -1,26 +1,22 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux'
-import { resetPostResponse } from '../features/shareable/ShareableSlice';
 import { myLog } from '../../utils';
 
-const ActionStatus = () => {
+const ActionStatus = ({status}) => {
 
-    const postStatus = useSelector(state => state.shareable.postStatus);
-    const postSuccess = useSelector(state=>state.shareable.postSuccess);
-    console.log("ActionStatus postStatus & postSuccess: ",postStatus,postSuccess)
-
-
+    const postSuccess = useSelector(state=>state.processStatus.postSuccess);
+    myLog("ActionStatus status & postSuccess: ",status,postSuccess)
 
     //No status to show
-    if(postStatus === null){
+    if(status === null){
         return null;
     }
-
-
 
     //conditional styling
     const color = postSuccess ?
         "green" : "red";
+    
+    //inline style
     const style = {
         padding: "2rem",
         marginBottom:"2rem",
@@ -32,9 +28,10 @@ const ActionStatus = () => {
 
     return (
         <div style={style}>
-            <h2>{postStatus}</h2>
+            <h2>{status}</h2>
         </div>
     );
 
 }
+
 export default ActionStatus;

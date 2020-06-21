@@ -2,6 +2,7 @@
 import {withRouter } from 'react-router-dom';
 import {connect} from 'react-redux';
 import {myLog} from "../../../utils";
+import { deleteShareable } from '../../redux-slices/ShareableSlice';
 
 
 const mapStateToProps = state =>{
@@ -43,7 +44,7 @@ class ShareableLarge extends Component {
                         {this.props.isManage &&
                             <div className="bottommost-actions">
                                 <button className="btn btn--adjacent" onClick={this.openItem}>Edit</button>
-                                <button className="btn btn--adjacent">Delete</button>
+                                <button className="btn btn--adjacent" onClick={this.deleteItem}>Delete</button>
                             </div>
                         }
                     </div>
@@ -71,6 +72,15 @@ class ShareableLarge extends Component {
 
     };
 
+    deleteItem = ()=>{
+
+        
+        const {id,title} = this.props.shareable;
+        myLog(`Will now delete item ${title}`);
+        const url = "/Shareable/DeleteShareable";
+        this.props.deleteShareable(url,{id, title});
+    }
+
 }
 
-export default connect(mapStateToProps)(withRouter(ShareableLarge));
+export default connect(mapStateToProps,{deleteShareable})(withRouter(ShareableLarge));
