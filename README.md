@@ -3,7 +3,7 @@
 # Features:
 - Its own data persistence mechanism
 - Emphasis for pure jQuery-free JS
-- `React-Redux` SPA, both class&hooks(React) and connect&hooks(Redux) methods, for the `Shareable` module.
+- `React-Redux` SPA, both class&hooks and connect&hooks variants, for the `Shareable` module.
 - Generic methods
 - Dynamic Sql Server query building
 - Ultra generic `getAll()` with just a `dynamic`-type search parameter.
@@ -14,8 +14,7 @@
 Found in:
 - */clientapp/*
 - */Repositories/*
-- */Areas/Accounts/Controllers/*
-- */Areas/Accounts/Views/Access/*
+- */Areas/Accounts/*
 - */Utils/*
 
 - [x] *more self-developed projects in Android, Java, .NET Core, Windows Forms, being prepared to be pushed currently!*
