@@ -1,5 +1,6 @@
 import React from 'react';
 import ShareableList from './ShareableList';
+import Loader from '../../util/Loader';
 import ActionStatus from "../ActionStatus";
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -29,8 +30,9 @@ class ViewShareables extends React.Component {
 
     render() {
 
-        const { postStatus } = this.props;
+        const { postStatus, itemsLength } = this.props;
 
+        
         return (
             <div className="content-container">
                 <div id="div_shareables" className="container-narrow">
@@ -39,11 +41,9 @@ class ViewShareables extends React.Component {
                         <span className="section-header-2">Your Posts</span>
                         <button className="btn btn--medium" onClick={this.manageShareables}>Manage Items</button>
                     </div>
+                    
                     <div id="shareable_items" className="container-shareables-1c">
                         <ShareableList />
-                    </div>
-                    <div className="form-actions form-actions--center">
-                        <button id="createShareable" type="button" className="btn btn--large1" onClick={this.showCreateComponent}>Add Shareable</button>
                     </div>
                 </div>
             </div>
@@ -64,7 +64,8 @@ class ViewShareables extends React.Component {
 
 const mapStateToProps = (state) => {
     return {
-        postStatus: state.processStatus.postStatus
+        postStatus: state.processStatus.postStatus,
+        itemsLength: state.shareable.shareables.length
     }
 }
 const mapDispatchToProps = (dispatch) => {
