@@ -10,14 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 using ASPracticeCore.DAL;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Authorization;
-using System.Web;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication;
-using System.Security.Claims;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 
 namespace ASPracticeCore.Controllers
 {
@@ -33,34 +28,28 @@ namespace ASPracticeCore.Controllers
         {
             //All supplied through DI
             _env = env;
-            //controller does the disposing of the context
-            _context = context;
             _config = config;
             _provider = provider;
+            //controller does the disposing of the context
+            _context = context;
         }
 
-        [HttpGet]
-        public IActionResult CreateShareable()
+        public IActionResult UserShareables()
         {
-            return UserShareables();
+            return View("Views/Shareable/UserShareables.cshtml");
         }
         public IActionResult ManageShareable()
         {
             return UserShareables();
         }
-        public IActionResult UserShareables()
+        [HttpGet]
+        public IActionResult CreateShareable()
         {
-            return View("Views/Shareable/UserShareables.cshtml");
+            return UserShareables();
         }
-
         [HttpPost]
-        public async Task<IActionResult> CreateShareableAsync(AddShareableViewModel shareableVM)
+        public async Task<IActionResult> CreateShareable(AddShareableViewModel shareableVM)
         {
-
-
-            //Util.DisplayObjectProperties(shareableVM);
-            //string savePath = _env.ContentRootPath + _config.GetValue<string>("ImageSavePath");
-
             //Save selected images to filesystem
             string savePath = _config.GetValue<string>("ImageSavePath");
             List<FilePath> files = await Util.ControllerUtil.SaveFilesToDisk(Request.Form.Files, savePath);
@@ -87,61 +76,64 @@ namespace ASPracticeCore.Controllers
 
             return Json(status);
 
-            //React "home", navigates to correct path with the address url
-            // return RedirectToAction("UserShareables", new { statusMessage = status });
         }
 
-        public async Task<IActionResult> UpdateShareableAsync(Shareable update)
+        public async Task<IActionResult> UpdateShareable(Shareable update)
         {
-            int activeUserId = Convert.ToInt32(HttpContext.User.Identity.Name);
-            update.UserAccountId = activeUserId;
-            update.DateTimeStamp = DateTime.Now;
+            string status = Constants.SUCCESS + "_" + update.Title + " was updated successfully!";
 
-            var repo = new RepositoryShareable();
-            string status = await repo.UpdateSpecific(_context,update);
+            try
+            {
+                int activeUserId = Convert.ToInt32(HttpContext.User.Identity.Name);
+                update.UserAccountId = activeUserId;
+                update.DateTimeStamp = DateTime.Now;
+
+                var repo = new RepositoryShareable();
+                await repo.UpdateExcludeImages(_context, update);
+
+            }
+            catch (Exception)
+            {
+                status = Util.AttachStatusToMessage(Constants.FAILED, Constants.INTERNAL_ERROR);
+            }
+
             return Json(status);
 
-            // return RedirectToAction("UserShareables", new { status = new {message = status} });
-
         }
 
-        public async Task<IActionResult> GetUserShareables(int userId)
+        public async Task<IActionResult> DeleteShareable(Shareable shareable)
         {
-            //test this
+
+            Util.Log($"id: {shareable.Id}", $"title: {shareable.Title}");
+            var repo = new RepositoryEF(_context);
+            string status = await repo.Delete<Shareable>(shareable.Id);
+
+            if (status == Constants.SUCCESS)
+            {
+                status = StatusGenerator.getSuccessMessage($"{shareable.Title} was removed from your posts");
+            }
+            return Json(status);
+        }
+
+        public async Task<IActionResult> GetUserShareables()
+        {
+            int userId = Convert.ToInt32(HttpContext.User.Identity.Name);
             RepositoryReflection repo = new RepositoryReflection();
-            var shareables = await repo.GetItemsOfOwner<Shareable>("useraccount", "shareable", userId);
-            Util.Log("Shareables size: ", shareables.Count());
+            var shareables = await repo.GetItemsOfOwnerAsync<Shareable>("useraccount", "shareable", userId);
+
+            //get child properties:
+            foreach (var shareable in shareables)
+            {
+                shareable.Paragraphs = await repo.GetItemsOfOwnerAsync<Paragraph>("shareable", "paragraph", shareable.Id) as List<Paragraph>;
+                shareable.FilePaths = await repo.GetItemsOfOwnerAsync<FilePath>("shareable", "filepath", shareable.Id) as List<FilePath>;
+            }
+
             return Json(shareables);
         }
         public IActionResult GetShareablesOfUser()
         {
             int userId = Convert.ToInt32(HttpContext.User.Identity.Name);
-            //var shareables = _context.GetEntitySet<Shareable>().Where(s => s.UserAccountId == userId).Include(s=>s.Paragraphs).Include(s=>s.FilePaths).ToList();
-            //var shareables = _context.GetEntitySet<Shareable>().Where(s => s.UserAccountId == userId).ToList();
-            string[] dummyFilePath = new string[] { "/images/kobe.jpeg" };
-            var shareables = _context.GetEntitySet<Shareable>().Where(s => s.UserAccountId == userId).Select(shareable => new
-            {
-                shareable.Id,
-                shareable.Title,
-                shareable.Introduction,
-                shareable.DateTimeStamp,
-                shareable.UserAccountId,
-                // Paragraphs = shareable.Paragraphs,
-                // FilePaths = shareable.FilePaths
-
-                //more specific:
-                Paragraphs = shareable.Paragraphs.Select(p => new
-                {
-                    p.Text
-                }),
-                FilePaths = shareable.FilePaths.Select(f => new
-                {
-                    f.Path
-                })
-
-            }).ToList();
-
-            Util.Log("How many shareables of user - ", shareables.Count);
+            var shareables = _context.GetEntitySet<Shareable>().Where(s => s.UserAccountId == userId).Include(s => s.Paragraphs).Include(s => s.FilePaths).ToList();
             return Json(shareables);
         }
 

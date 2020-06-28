@@ -89,14 +89,14 @@ const DisplayShareable = (props) => {
                         <div id="paragraphs_container" className="input-wrapper-medium">
                             {
                                 paragraphs.length <= 0 ?
-                                    <div id="ParagraphsData[0]">
+                                    <div id="ParagraphsData[0]" className="paragraph-wrapper">
                                         <input id={"Paragraphs_0__Id"} name={"Paragraphs[0].Id"} hidden />
                                         <textarea readOnly={isView} id="Paragraphs_0__Text" name="Paragraphs[0].Text" rows="8" className={class_text_area}></textarea>
                                     </div>
                                     : //ternary, render many:
                                     paragraphs.map((el, i) => {
                                         return (
-                                            <div id={`ParagraphsData[${i}]`}>
+                                            <div id={`ParagraphsData[${i}]`} className="paragraph-wrapper">
                                                 <input id={`Paragraphs_${i}__Id`} name={`Paragraphs[${i}].Id`} value={el.id} hidden />
                                                 <textarea defaultValue={el.text} readOnly={isView} id={`Paragraphs_${i}__Text`} name={`Paragraphs[${i}].Text`} rows="8" className={class_text_area}></textarea>
                                             </div>

@@ -64,7 +64,10 @@ const CreateShareable = () => {
                         <btn id="btn_add" className="btn btn-icon noselect" onClick={increaseP} style={{ margin: '0 0.5rem' }}>+</btn>
                         <btn id="btn_remove" className="btn btn-icon noselect" onClick={reduceP}>-</btn>
                         <div id="paragraphs_container" className="input-wrapper-medium">
-                            <textarea id="Paragraphs_0__Text" name="Paragraphs[0].Text" rows="8" cols="50" className="field-input field-input--area"></textarea>
+                            <div id="ParagraphsData[0]" className="paragraph-wrapper">
+                                <input id={"Paragraphs_0__Id"} name={"Paragraphs[0].Id"} hidden />
+                                <textarea id="Paragraphs_0__Text" name="Paragraphs[0].Text" rows="8" cols="50" className="field-input field-input--area"></textarea>
+                            </div>
                         </div>
                     </div>
 
@@ -106,7 +109,7 @@ const CreateShareable = () => {
 
         //gives the dispatch reference to the async thunk function
         dispatch(addShareable(url, formData));
-
+        
     }
 
     return componentMarkup;
