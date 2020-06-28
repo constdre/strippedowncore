@@ -13,8 +13,7 @@ namespace ASPracticeCore.Models
     {
         public Shareable()
         {
-            Paragraphs = new List<Paragraph>();
-            FilePaths = new List<FilePath>();
+            
         }
 
         public int Id { get; set; }
@@ -24,8 +23,10 @@ namespace ASPracticeCore.Models
         public int UserAccountId { get; set; }
 
         public virtual UserAccount UserAccount { get; set; }
-        public virtual ICollection<Paragraph> Paragraphs { get; set; }
-        public virtual ICollection<FilePath> FilePaths { get; set; }
+        public virtual List<Paragraph> Paragraphs { get; set; }
+        public virtual List<FilePath> FilePaths { get; set; }
+
+
 
 
     }

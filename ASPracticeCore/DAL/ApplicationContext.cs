@@ -59,7 +59,7 @@ namespace ASPracticeCore.DAL
                 entity.HasOne(d => d.Shareable)
                     .WithMany(p => p.FilePaths)
                     .HasForeignKey(d => d.ShareableId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK__FilePath__sharea__0E04126B");
             });
 
@@ -76,7 +76,7 @@ namespace ASPracticeCore.DAL
                 entity.HasOne(d => d.FilePath)
                     .WithOne(p => p.ImageFile)
                     .HasForeignKey<ImageFile>(d => d.Id)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK__ImageFile__id__10E07F16");
             });
 
@@ -93,6 +93,7 @@ namespace ASPracticeCore.DAL
                 entity.HasOne(d => d.Shareable)
                     .WithMany(p => p.Paragraphs)
                     .HasForeignKey(d => d.ShareableId)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK__Paragraph__share__74444068");
             });
 
@@ -120,6 +121,7 @@ namespace ASPracticeCore.DAL
                 entity.HasOne(d => d.UserAccount)
                     .WithMany(p => p.Shareables)
                     .HasForeignKey(d => d.UserAccountId)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK__Shareable__usera__7167D3BD");
             });
 

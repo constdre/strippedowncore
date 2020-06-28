@@ -26,16 +26,13 @@ namespace ASPracticeCore.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-
-            //await Util.ControllerUtil.MockLoginAsync(2, "admin", _context);
             return View();
         }
 
         public IActionResult About()
         {
-            //ViewData["Message"] = "ASP.NET Core 3.0 and that's it. \n\t-Own persistence mechanism through dynamic generic queries.\n-\tjust Javascript";
             return View();
         }
 

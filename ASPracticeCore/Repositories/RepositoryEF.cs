@@ -1,7 +1,6 @@
 ﻿using ASPracticeCore.Models;
 using ASPracticeCore.DAL;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -9,23 +8,23 @@ using ASPracticeCore.Utils;
 
 namespace ASPracticeCore.Repositories
 {
-    public class RepositoryEF : 
+    public class RepositoryEF :
     IRepository
     {
-        readonly IDbContext dbContext;
+        readonly IDbContext context;
 
         public RepositoryEF(IDbContext dbContext)
         {
-            this.dbContext = dbContext;
+            this.context = dbContext;
         }
         public string Create<T>(T entity) where T : class, IEntity
         {
-            DbSet<T> dbSet = dbContext.GetEntitySet<T>();
+            DbSet<T> dbSet = context.GetEntitySet<T>();
             string statusMessage = Constants.SUCCESS;
             dbSet.Add(entity);
             try
             {
-                dbContext.SaveChanges();
+                context.SaveChanges();
             }
             catch (Exception)
             {
@@ -37,18 +36,11 @@ namespace ASPracticeCore.Repositories
         {
             string statusMessage = Constants.SUCCESS;
 
-            //cast IDbContext to DbContext for the Update method
-            // var context = dbContext as DbContext;
+            var dbContext = context as DbContext;
             try
             {
-                //delete then update for now
-                Delete<T>(entity.Id);
-                entity.Id = default;
-                Create<T>(entity);
-
                 //updates all props
-                // context.Update(entity);
-                
+                dbContext.Update(entity);
                 dbContext.SaveChanges();
             }
             catch (Exception)
@@ -60,24 +52,28 @@ namespace ASPracticeCore.Repositories
 
         }
 
-        public string Delete<T>(int id) where T : class, IEntity
+        public async Task<string> Delete<T>(int id) where T : class, IEntity
         {
             string statusMessage = Constants.SUCCESS;
+
             try
             {
-                dbContext.GetEntitySet<T>().Remove(GetById<T>(id));
-                dbContext.SaveChanges();
+                T entity = await GetById<T>(id);
+                context.GetEntitySet<T>().Remove(entity);
+                
+                var dbContext = context as DbContext;
+                await dbContext.SaveChangesAsync(); 
             }
             catch (Exception)
             {
-                statusMessage = Util.AttachStatusToMessage(Constants.FAILED,  Constants.INTERNAL_ERROR);
+                statusMessage = Util.AttachStatusToMessage(Constants.FAILED, Constants.INTERNAL_ERROR);
             }
             return statusMessage;
         }
 
-        public T GetById<T>(int id) where T : class, IEntity
+        public async Task<T> GetById<T>(int id) where T : class, IEntity
         {
-            T entity = dbContext.GetEntitySet<T>().Find(id);
+            T entity = await context.GetEntitySet<T>().FindAsync(id);
             return entity;
         }
 

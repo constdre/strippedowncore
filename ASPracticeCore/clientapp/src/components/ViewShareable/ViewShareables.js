@@ -24,14 +24,12 @@ class ViewShareables extends React.Component {
     }
     componentWillUnmount() {
         //reset postStatus and postSuccess to stop showing alert the next time.
-        console.log("View Shareable resetting postsuccess states...");
         resetPostSuccess();
     }
 
     render() {
 
-        const { postStatus, itemsLength } = this.props;
-
+        const { postStatus } = this.props;
         
         return (
             <div className="content-container">

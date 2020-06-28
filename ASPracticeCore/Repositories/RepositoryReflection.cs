@@ -9,14 +9,13 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
-using Microsoft.AspNetCore.Http;
 using ASPracticeCore.Areas.Accounts.Models;
 
 namespace ASPracticeCore.Repositories
 {
     public class RepositoryReflection : IRepositoryA
     {
-        
+
 
         /// <summary>
         ///  Method-level Generic Repository - depending on arg type.
@@ -31,7 +30,7 @@ namespace ASPracticeCore.Repositories
         string status = Constants.FAILED;
         string tableName;
         IDbConnection conn;
-        
+
         public RepositoryReflection()
         {
             //list of table names with PRIMARY KEY IDENTITY constraints
@@ -45,7 +44,7 @@ namespace ASPracticeCore.Repositories
         /// <typeparam name="T"></typeparam>
         /// <param name="entity"></param>
         /// <returns>procedure status</returns>
-        public string Add<T>(T entity) where T: EntityBase
+        public string Add<T>(T entity) where T : EntityBase
         {
             StringBuilder sb = new StringBuilder();
             tableName = Util.GetClassName(entity.GetType()).ToLower();
@@ -59,7 +58,7 @@ namespace ASPracticeCore.Repositories
 
             sb.Append(propNamesQuery).Append(" VALUES ").Append(valueParamsQuery);// -> "(prop1,prop2) VALUES (@prop1,@prop2)"
             string dynamicQuery = sb.ToString();
-            
+
             //query execution
             try
             {
@@ -81,14 +80,14 @@ namespace ASPracticeCore.Repositories
             catch (Exception ex)
             {
                 Util.Log("Add() EXCEPTION\n", ex.ToString());
-                status =  Constants.INTERNAL_ERROR;
+                status = Constants.INTERNAL_ERROR;
             }
 
 
             Util.Log("Add() final status \n", status, "\nEnd Add()");
             return status;
-        }        
-        public string AddEntity<T>(T entity) where T: IEntity
+        }
+        public string AddEntity<T>(T entity) where T : IEntity
         {
             StringBuilder sb = new StringBuilder();
             tableName = Util.GetClassName(entity.GetType()).ToLower();
@@ -103,7 +102,7 @@ namespace ASPracticeCore.Repositories
 
             sb.Append(propNamesQuery).Append(" VALUES ").Append(valueParamsQuery);// -> "(prop1,prop2) VALUES (@prop1,@prop2)"
             string dynamicQuery = sb.ToString();
-            
+
             //query execution
             try
             {
@@ -130,7 +129,7 @@ namespace ASPracticeCore.Repositories
             catch (Exception ex)
             {
                 Util.Log("Add() EXCEPTION\n", ex.ToString());
-                status =  Constants.INTERNAL_ERROR;
+                status = Constants.INTERNAL_ERROR;
             }
 
 
@@ -153,7 +152,7 @@ namespace ASPracticeCore.Repositories
         /// </summary>
         /// <typeparam name="T">The user-defined reference type</typeparam>
         /// <returns>List of table entries</returns>
-        public List<T> GetAll<T>() 
+        public List<T> GetAll<T>()
         {
 
             Util.Log("Inside GetAll()");
@@ -173,9 +172,9 @@ namespace ASPracticeCore.Repositories
 
                     while (dr.Read())
                     {
-                        
+
                         dynamic entity = Activator.CreateInstance(typeof(T));
-                        
+
                         //iterate on the table's columns (rows of SchemaTable)
                         foreach (DataRow row in schemaTable.Rows)
                         {
@@ -183,13 +182,13 @@ namespace ASPracticeCore.Repositories
                             string columnName = row[column_key].ToString();
 
                             PropertyInfo prop = typeof(T).GetProperty(columnName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-                            
+
 
                             //get column value from datareader through column name 
                             var columnValue = dr.GetValue(dr.GetOrdinal(columnName));//or dr[columnName]
                             Util.Log($"{columnName} : {columnValue}");
                             //set entity's property value
-                            prop.SetValue(entity, columnValue);     
+                            prop.SetValue(entity, columnValue);
 
                         }
                         entities.Add(entity);
@@ -219,13 +218,13 @@ namespace ASPracticeCore.Repositories
             PropertyInfo[] props = filters.GetType().GetProperties();
 
             //build the WHERE clause from the anonymous object's properties
-            for(int i=0; i<props.Length; i++)
+            for (int i = 0; i < props.Length; i++)
             {
                 var name = props[i].Name;
                 var val = "@" + name;
-                sb.Append(name+" = "+val);
+                sb.Append(name + " = " + val);
 
-                if (i!=props.Length-1)
+                if (i != props.Length - 1)
                 {
                     sb.Append(" AND ");
                 }
@@ -255,24 +254,24 @@ namespace ASPracticeCore.Repositories
                 }
 
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Util.Log(e.ToString());
             }
 
-
             return entities;
+
 
         }
         public T GetById<T>(int id) where T : EntityBase
         {
-            return GetFiltered<T>(new {id}).FirstOrDefault();
+            return GetFiltered<T>(new { id }).FirstOrDefault();
         }
 
         //aims to consider properties of type EntityBase
         private bool WriteDynamicAddQuery(PropertyInfo[] props, string tableName, ref string query)
         {
-            
+
             string colSpec, valueParams;
             bool isSkipId = Util.DbUtil.IsIdAutoIncrement(tableName);
             int factorIndex = isSkipId ? props.Length - 2 : props.Length - 1;
@@ -313,29 +312,45 @@ namespace ASPracticeCore.Repositories
 
 
         /// <summary>
-        /// async - gets the child data of a parent entity e.g. dish : ingredients
+        /// gets the child data of a parent entity e.g. dish : ingredients
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="ownerClassName">class name of the parent, assumes schema table is equal to class name</param>
-        /// <param name="itemClassName">class name of the child, assumes schema table is equal to class name</param>
+        /// <param name="ownerClassName">class name of the parent, given class name = table name</param>
+        /// <param name="itemClassName">class name of the child, given class name = table name</param>
         /// <param name="ownerId">id of the parent</param>
         /// <returns></returns>
-        public async Task<IEnumerable<T>> GetItemsOfOwner<T>(string ownerClassName, string itemClassName, int ownerId)
+        public async Task<IEnumerable<T>> GetItemsOfOwnerAsync<T>(string ownerClassName, string itemClassName, int ownerId)
         {
             string sql = "usp_GetItemsOfOwner";
             string fkName = ownerClassName + "id";
             using (conn = Util.DbUtil.GetConnection())
             {
-                return await conn.QueryAsync<T>(sql, new { items_table = itemClassName.ToLower(), fk_column_name = fkName.ToLower(), fk_value = ownerId.ToString() }, commandType: CommandType.StoredProcedure);
+                return await conn.QueryAsync<T>(sql,
+                new
+                {
+                    items_table = itemClassName.ToLower(),
+                    fk_column_name = fkName.ToLower(),
+                    fk_value = ownerId.ToString()
+                },
+                commandType: CommandType.StoredProcedure);
             }
         }
+        
         public IEnumerable<Shareable> GetShareablesOfUser(int id)
         {
-            string sql = "usp_GetItemsOfOwner";
+            string sql = Constants.USP_GETITEMSOFOWNER;
             IEnumerable<Shareable> userShareables;
+
             using (conn = Util.DbUtil.GetConnection())
             {
-                userShareables = conn.Query<Shareable>(sql, new { items_table = "shareable", fk_column_name = "userid", fk_column_value = id.ToString() }, commandType: CommandType.StoredProcedure);
+                userShareables = conn.Query<Shareable>(sql,
+                new
+                {
+                    items_table = "shareable",
+                    fk_column_name = "userid",
+                    fk_column_value = id.ToString()
+                },
+                commandType: CommandType.StoredProcedure);
             }
             return userShareables;
         }
@@ -355,6 +370,7 @@ namespace ASPracticeCore.Repositories
                 Util.Log("GetUserByEmail EXCEPTION!\n", ex.ToString());
                 return null;
             }
+
             return result.FirstOrDefault();
 
         }

@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import UserShareables from './UserShareables';
 import ManageShareable from './ManageShareable/ManageShareable';
-import '../../../wwwroot/css/shareable.css'
 
 
 //Your React App - Entrypoint 

@@ -4,7 +4,6 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using ASPracticeCore.Models;
 using ASPracticeCore.Utils;
 using Dapper;
@@ -14,7 +13,6 @@ namespace ASPracticeCore.Repositories
     public class RepositoryDapper : IRepositoryA
     {
         IDbConnection conn;
-        StringBuilder sb;
         string tableName;
         string sql;
         Type entityType;
@@ -27,7 +25,7 @@ namespace ASPracticeCore.Repositories
 
         public string Add<T>(T entity) where T : EntityBase
         {
-            sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
             entityType = entity.GetType();
             tableName = Util.GetClassName(entityType);
             props = entityType.GetProperties();

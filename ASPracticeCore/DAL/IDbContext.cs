@@ -12,13 +12,11 @@ namespace ASPracticeCore.DAL
     {
         //Will turn this into abstract class so it inherits directly from DbContext
 
-        
         //we provide this common generic method to the implementors
         DbSet<T> GetEntitySet<T>() where T : class, IEntity;
 
         //======already implemented by DbContext, made accessible to concrete classes:
         int SaveChanges();
-        // Task<int> SaveChangesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-        // EntityEntry<T> Update<T>(T entity) where T: class;
+
     }
 }

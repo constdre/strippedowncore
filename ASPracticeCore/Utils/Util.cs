@@ -24,6 +24,92 @@ namespace ASPracticeCore.Utils
 {
     public class Util
     {
+                /// <summary>
+        /// (DISCOURAGED - REFERENCE ONLY.
+        /// Make your application RESTful. Put session data in DB, retrieve with key from request cookie.
+        /// Native .NET Session API
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="name"></param>
+        public static async Task AssignCachedSessionData(int id, string name)
+        {
+            var httpSession = new HttpContextAccessor().HttpContext.Session;
+            await httpSession.LoadAsync(); //makes the session operations async
+            httpSession.Set(Constants.KEY_USERID, id.ToString());
+            httpSession.Set(Constants.KEY_USER_NAME, name);
+        }
+        public static AuthenticationTicket DecryptAuthCookie(IDataProtectionProvider provider, HttpRequest httpRequest)
+        {
+            //parse cookie data encrypted by DataProtection API to C# object
+            var dataProtector = provider.CreateProtector("Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware", CookieAuthenticationDefaults.AuthenticationScheme, "v2");
+            var ticketDataFormat = new TicketDataFormat(dataProtector);
+            AuthenticationTicket authTicket = ticketDataFormat.Unprotect(httpRequest.Cookies[Constants.COOKIE_NAME_AUTH]);
+            return authTicket;
+        }
+        public static async Task<string> SaveFormFileToPath(IFormFile formFile, string path)
+        {
+            //Method that copies FormFile's content to specific file
+
+            if (formFile.Length <= 0)
+            {
+                return Constants.FAILED;
+            }
+
+            string uniqueName = Guid.NewGuid().ToString() + "_" + formFile.FileName + Path.GetExtension(formFile.FileName);
+            var filePath = Path.Combine(path, uniqueName);
+
+            var newFile = File.Create(filePath);
+            using (FileStream stream = newFile)
+            {
+                await formFile.CopyToAsync(stream);
+            }
+            return filePath;
+
+        }
+
+        public static bool IsPrimitive(Type type)
+        {
+            bool isPrimitive = type.IsPrimitive || type.Namespace == null || type.Namespace.Equals("System");
+            Log(type + " isPrimitive?", isPrimitive);
+            return isPrimitive;
+        }
+
+        public static void DisplayObjectProperties<T>(T obj) where T : class
+        {
+            Log("Expanding the properties:");
+            Log("Type:", typeof(T));
+            PropertyInfo[] props = typeof(T).GetProperties();
+            Array.ForEach(props, p =>
+            {
+                Log(p.Name, ":", p.GetValue(obj));
+            });
+        }
+
+        public static string GetClassName(Object obj)
+        {
+            string[] names = obj.GetType().ToString().Split('.');
+            return names[names.Length - 1].ToLower();
+        }
+        public static string GetClassName(Type type)
+        {
+            string[] names = type.ToString().Split('.');
+            return names[names.Length - 1].ToLower();
+        }
+        public static string AttachStatusToMessage(string status, string message)
+        {
+            return status + "_" + message;
+        }
+        public static bool IsText(Object prop)
+        {
+            return prop.GetType() == typeof(string);
+        }
+        public static void Log(params object[] objs)
+        {
+            System.Diagnostics.Debug.WriteLine(string.Join(' ', objs));
+        }
+
+
+        //==========Database Utility Methods
         public class DbUtil
         {
 
@@ -212,10 +298,12 @@ namespace ASPracticeCore.Utils
             }
             public static void InitializeIdentityTableList()
             {
+                //Identity auto-increment table
                 identityIdTables.Add("useraccount");
-                identityIdTables.Add("statickv");
-                identityIdTables.Add("session");
-                identityIdTables.Add("sessiondata");
+                identityIdTables.Add("shareable");
+                identityIdTables.Add("filepath");
+                identityIdTables.Add("imagefile");
+                identityIdTables.Add("paragraph");
 
             }
             public static void InsertStaticData(string key, string value)
@@ -264,6 +352,9 @@ namespace ASPracticeCore.Utils
 
         }
 
+
+
+        //==========Controller Utility Methods
         public class ControllerUtil
         {
             public ControllerUtil()
@@ -369,8 +460,6 @@ namespace ASPracticeCore.Utils
                             //ID = both the primary (auto-inc) and foreign key
                             ImageSize = file.Length
                         }
-
-
                     };
 
                     //for now the first image is display pic
@@ -398,88 +487,7 @@ namespace ASPracticeCore.Utils
 
 
         
-        /// <summary>
-        /// (DISCOURAGED - REFERENCE ONLY.
-        /// Make your application RESTful. Put session data in DB, retrieve with key from request cookie.
-        /// Native .NET Session API
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="name"></param>
-        public static async Task AssignCachedSessionData(int id, string name)
-        {
-            var httpSession = new HttpContextAccessor().HttpContext.Session;
-            await httpSession.LoadAsync(); //makes the session operations async
-            httpSession.Set(Constants.KEY_USERID, id.ToString());
-            httpSession.Set(Constants.KEY_USER_NAME, name);
-        }
-        public static AuthenticationTicket DecryptAuthCookie(IDataProtectionProvider provider, HttpRequest httpRequest)
-        {
-            //parse cookie data encrypted by DataProtection API to C# object
-            var dataProtector = provider.CreateProtector("Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware", CookieAuthenticationDefaults.AuthenticationScheme, "v2");
-            var ticketDataFormat = new TicketDataFormat(dataProtector);
-            AuthenticationTicket authTicket = ticketDataFormat.Unprotect(httpRequest.Cookies[Constants.COOKIE_NAME_AUTH]);
-            return authTicket;
-        }
-        public static async Task<string> SaveFormFileToPath(IFormFile formFile, string path)
-        {
-            //Method that copies FormFile's content to specific file
 
-            if (formFile.Length <= 0)
-            {
-                return Constants.FAILED;
-            }
-
-            string uniqueName = Guid.NewGuid().ToString() + "_" + formFile.FileName + Path.GetExtension(formFile.FileName);
-            var filePath = Path.Combine(path, uniqueName);
-            //var filePath = Path.Combine(path, Path.GetRandomFileName());
-
-            using (FileStream stream = File.Create(filePath))
-            {
-                await formFile.CopyToAsync(stream);
-            }
-            return filePath;
-        }
-
-        public static bool IsPrimitive(Type type)
-        {
-            bool isPrimitive = type.IsPrimitive || type.Namespace == null || type.Namespace.Equals("System");
-            Log(type + " isPrimitive?", isPrimitive);
-            return isPrimitive;
-        }
-
-        public static void DisplayObjectProperties<T>(T obj) where T : class
-        {
-            Log("Expanding the properties:");
-            Log("Type:", typeof(T));
-            PropertyInfo[] props = typeof(T).GetProperties();
-            Array.ForEach(props, p =>
-            {
-                Log(p.Name, ":", p.GetValue(obj));
-            });
-        }
-
-        public static string GetClassName(Object obj)
-        {
-            string[] names = obj.GetType().ToString().Split('.');
-            return names[names.Length - 1].ToLower();
-        }
-        public static string GetClassName(Type type)
-        {
-            string[] names = type.ToString().Split('.');
-            return names[names.Length - 1].ToLower();
-        }
-        public static string AttachStatusToMessage(string status, string message)
-        {
-            return status + "_" + message;
-        }
-        public static bool IsText(Object prop)
-        {
-            return prop.GetType() == typeof(string);
-        }
-        public static void Log(params object[] objs)
-        {
-            System.Diagnostics.Debug.WriteLine(string.Join(' ', objs));
-        }
 
 
 

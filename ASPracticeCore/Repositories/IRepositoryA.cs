@@ -8,7 +8,9 @@ namespace ASPracticeCore.Repositories
 {
     public interface IRepositoryA
     {
-        string Add<T>(T entity) where T : EntityBase; //could do without type specif, but I want the arguments to just be EntityBase
+        //This version of interface uses abstact class EntityBase as the type parameter for the generic methods
+        
+        string Add<T>(T entity) where T : EntityBase; //could do w/o type specif, but I want the arguments to be of type EntityBase
         string Update<T>(T entity) where T : EntityBase;
         string Delete();
         List<T> GetAll<T>();

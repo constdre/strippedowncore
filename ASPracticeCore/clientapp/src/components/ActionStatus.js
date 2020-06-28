@@ -13,14 +13,14 @@ const ActionStatus = ({status}) => {
     }
 
     //conditional styling
-    const color = postSuccess ?
+    const backgroundColor = postSuccess ?
         "green" : "red";
     
     //inline style
     const style = {
         padding: "2rem",
         marginBottom:"2rem",
-        backgroundColor: color,
+        backgroundColor,
         color:"white",
         borderRadius: "15px",
         fontFamily: ' "Roboto",sans-serif '

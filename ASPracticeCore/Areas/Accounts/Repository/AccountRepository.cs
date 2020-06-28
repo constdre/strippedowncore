@@ -23,8 +23,6 @@ namespace ASPracticeCore.Repositories
 
         public UserAccount Authenticate(string email, string password)
         {
-            Util.Log("email:", email, "\npassword:", password);
-
             //through reflection:
             UserAccount account = GetFiltered<UserAccount>(new { email, password }).FirstOrDefault();
             return account; 
