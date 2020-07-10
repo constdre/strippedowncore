@@ -60,9 +60,9 @@ namespace ASPracticeCore.Repositories
             {
                 T entity = await GetById<T>(id);
                 context.GetEntitySet<T>().Remove(entity);
-                
+
                 var dbContext = context as DbContext;
-                await dbContext.SaveChangesAsync(); 
+                await dbContext.SaveChangesAsync();
             }
             catch (Exception)
             {
@@ -77,11 +77,5 @@ namespace ASPracticeCore.Repositories
             return entity;
         }
 
-
-        public IQueryable<T> Get<T>() where T : class, IEntity
-        {
-
-            throw new NotImplementedException();
-        }
     }
 }

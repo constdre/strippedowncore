@@ -80,36 +80,28 @@ namespace ASPracticeCore.Controllers
 
         public async Task<IActionResult> UpdateShareable(Shareable update)
         {
-            string status = Constants.SUCCESS + "_" + update.Title + " was updated successfully!";
 
-            try
-            {
                 int activeUserId = Convert.ToInt32(HttpContext.User.Identity.Name);
                 update.UserAccountId = activeUserId;
                 update.DateTimeStamp = DateTime.Now;
 
                 var repo = new RepositoryShareable();
-                await repo.UpdateExcludeImages(_context, update);
+                string status = await repo.UpdateExcludeImages(_context, update);
 
-            }
-            catch (Exception)
-            {
-                status = Util.AttachStatusToMessage(Constants.FAILED, Constants.INTERNAL_ERROR);
-            }
 
             return Json(status);
 
         }
 
-        public async Task<IActionResult> DeleteShareable(Shareable shareable)
+        public async Task<IActionResult> DeleteShareable([FromBody] Shareable shareable)
         {
 
-            Util.Log($"id: {shareable.Id}", $"title: {shareable.Title}");
             var repo = new RepositoryEF(_context);
             string status = await repo.Delete<Shareable>(shareable.Id);
 
             if (status == Constants.SUCCESS)
             {
+                //Since Delete() is generic, it doesn't have access to specific props like Title, we form the status message here
                 status = StatusGenerator.getSuccessMessage($"{shareable.Title} was removed from your posts");
             }
             return Json(status);
