@@ -16,6 +16,9 @@ class ShareableLarge extends Component {
     constructor(props) {
         super(props);
         this.shareableUrl = this.props.match.url + "/" + this.props.shareable.id;
+        this.state = {
+            deleteConfirm: false
+        }
     }
 
     render() {
@@ -39,22 +42,39 @@ class ShareableLarge extends Component {
                         </div>
                         <div id="sIntroduction" className="s-intro">{shareable.introduction}</div>
 
-                        {/* conditional rendering */}
-                        {this.props.isManage &&
-                            <div className="bottommost-actions">
-                                <button className="btn btn--adjacent" onClick={this.openItem}>Edit</button>
-                                <button className="btn btn--adjacent" onClick={this.deleteItem}>Delete</button>
-                            </div>
-                        }
+                        {/* Conditional markup: */}
+                        {this.deleteFunction()}
+
                     </div>
                 </div>
             </div>
         );
     }
 
-    openItem = () => {
+    deleteFunction() {
+        if (this.props.isManage && !this.state.deleteConfirm) {
+            return (
+                <div className="bottommost-actions">
+                    <button className="btn btn--adjacent" onClick={this.openItem}>Edit</button>
+                    <button className="btn btn--adjacent" onClick={this.deleteConfirmation}>Delete</button>
+                </div>
+            );
+        } else if (this.state.deleteConfirm) {
+            myLog("Showing delete confirmation");
+            const { title } = this.props.shareable;
+            return (
+                <div className="bottommost-actions">
+                    <p>Are you sure you want to delete {title}?</p>
+                    <button className="btn btn--adjacent" onClick={this.deleteCancel}>Back</button>
+                    <button className="btn btn--adjacent" onClick={this.deleteItem}>Yes</button>
+                </div>
+            );
+        } else {
+            return null;
+        }
+    }
 
-        myLog("Clcked url:", this.shareableUrl);
+    openItem = () => {
 
         //pass data so no need for request to the server 
         const locationWithState = {
@@ -71,8 +91,15 @@ class ShareableLarge extends Component {
 
     };
 
+    deleteConfirmation = () => {
+        this.setState({
+            deleteConfirm: true
+        });
+    }
+    deleteCancel = () => {
+        this.setState({deleteConfirm: false });
+    }
     deleteItem = () => {
-
 
         const { id, title } = this.props.shareable;
         myLog(`Will now delete item ${title}`);
