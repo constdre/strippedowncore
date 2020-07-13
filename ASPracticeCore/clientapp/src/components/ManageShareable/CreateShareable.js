@@ -77,15 +77,17 @@ const CreateShareable = () => {
 
                         <div id="div_preview" className="hidden-element vertical-list" style={{ marginTop: '1.5rem' }}>
                             <p id="p_filename" className="field-label field-label--medium"></p>
-                            <div className="shareable-large">
+
+                            <div className="shareable-medium">
                                 <div>
                                     <img id="preview_image" className="image" src="~/images/kobe.jpeg" />
                                 </div>
                                 <div className="s-details">
-                                    <p id="preview_title" className="s-title"></p>
-                                    <p id="preview_intro" className="s-intro"></p>
+                                    <div id="preview_title" className="s-title"></div>
+                                    <div id="preview_intro" className="s-intro"></div>
                                 </div>
                             </div>
+
                         </div>
 
                     </div>
@@ -103,13 +105,12 @@ const CreateShareable = () => {
 
         e.preventDefault();
         const postForm = document.forms.namedItem("createForm");
-        myLog(postForm);
         const formData = new FormData(postForm);
         const url = postForm.dataset.action
 
         //gives the dispatch reference to the async thunk function
         dispatch(addShareable(url, formData));
-        
+
     }
 
     return componentMarkup;
