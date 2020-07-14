@@ -1,6 +1,7 @@
 # strippedowncore
 *Vanilla-flavored (with assorted sprinkles)* web application in asp.net CORE MVC
-# Features:
+## Features:
+**In `ASPracticeCore/Repositories/RepositoryReflection.cs`:**
 - Its own data persistence mechanism
 - Emphasis for pure jQuery-free JS
 - `React-Redux` SPA, both class&hooks and connect&hooks variants, for the `Shareable` module.
